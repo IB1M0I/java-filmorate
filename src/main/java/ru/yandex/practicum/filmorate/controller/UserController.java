@@ -27,15 +27,19 @@ public class UserController {
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
         if (user.getEmail() == null || user.getEmail().isBlank()) {
-            log.error("Email не может быть пустым");
-            throw new ValidationException("Email не может быть пустым");
+            log.error("email не может быть пустым");
+            throw new ValidationException("email не может быть пустым");
         }
         if (user.getLogin() == null || user.getLogin().isBlank()) {
-            log.error("Login не может быть пустым");
-            throw new ValidationException("Login не может быть пустым");
+            log.error("login не может быть пустым");
+            throw new ValidationException("login не может быть пустым");
+        }
+        if(user.getLogin().contains(" ")){
+            log.error("login не может содержать пробелы");
+            throw new ValidationException("login не может содержать пробелы");
         }
         if (user.getName() == null || user.getName().isBlank()) {
-            log.info("Name пустой, в name присвоен login");
+            log.info("name пустой, в name присвоен login");
             user.setName(user.getLogin());
         }
 

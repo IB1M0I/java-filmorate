@@ -20,7 +20,7 @@ public class Film {
 
     LocalDate releaseDate; //Дата выпуска фильма
 
-    @Positive
+    @Positive(message = "Длительность фильма не может быть 0")
     Integer duration; //Продолжительность фильма
 
 
