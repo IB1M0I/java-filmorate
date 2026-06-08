@@ -34,7 +34,7 @@ public class UserController {
             log.error("login не может быть пустым");
             throw new ValidationException("login не может быть пустым");
         }
-        if(user.getLogin().contains(" ")){
+        if (user.getLogin().contains(" ")) {
             log.error("login не может содержать пробелы");
             throw new ValidationException("login не может содержать пробелы");
         }

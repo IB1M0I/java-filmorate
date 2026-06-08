@@ -4,7 +4,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 
-import javax.xml.stream.XMLEventWriter;
 import java.time.LocalDate;
 
 @Data

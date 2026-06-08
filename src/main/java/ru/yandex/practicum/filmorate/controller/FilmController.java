@@ -77,11 +77,7 @@ public class FilmController {
     }
 
     private long getNextId() {
-        long currentId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0L);
+        long currentId = films.keySet().stream().mapToLong(id -> id).max().orElse(0L);
         log.trace("Сгенерирован новый id");
         return ++currentId;
     }
