@@ -135,7 +135,7 @@ public class FilmValidationTest {
     }
 
     @Test
-    public void filmDurationIsNegative(){
+    public void filmDurationIsNegative() {
         Film film = new Film();
 
         film.setId(1L);
@@ -152,7 +152,7 @@ public class FilmValidationTest {
     }
 
     @Test
-    public void filmDurationIsPositive(){
+    public void filmDurationIsPositive() {
         Film film = new Film();
 
         film.setId(1L);

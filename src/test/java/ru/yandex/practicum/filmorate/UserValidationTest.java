@@ -5,7 +5,6 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.UserController;
@@ -27,19 +26,19 @@ public class UserValidationTest {
     }
 
     @Test
-    public void userEmailIsEmpty(){
+    public void userEmailIsEmpty() {
         User user = new User();
         user.setId(1L);
         user.setLogin("login");
         user.setName("name");
         user.setEmail("");
-        user.setBirthday(LocalDate.of(1990, 5, 15) );
+        user.setBirthday(LocalDate.of(1990, 5, 15));
 
         Assertions.assertThrows(ValidationException.class, () -> userController.addUser(user));
     }
 
     @Test
-    public void userEmailWithoutAtSign(){
+    public void userEmailWithoutAtSign() {
         User user = new User();
         user.setId(1L);
         user.setLogin("login");
@@ -55,7 +54,7 @@ public class UserValidationTest {
     }
 
     @Test
-    public void userLoginIsEmpty(){
+    public void userLoginIsEmpty() {
         User user = new User();
         user.setId(1L);
         user.setLogin("");
@@ -67,7 +66,7 @@ public class UserValidationTest {
     }
 
     @Test
-    public void userLoginContainsSpace(){
+    public void userLoginContainsSpace() {
         User user = new User();
         user.setId(1L);
         user.setLogin("log in");
@@ -79,7 +78,7 @@ public class UserValidationTest {
     }
 
     @Test
-    public void userNameIsEmptyUsesLogin(){
+    public void userNameIsEmptyUsesLogin() {
         User user = new User();
         user.setId(1L);
         user.setLogin("login");
@@ -93,7 +92,7 @@ public class UserValidationTest {
     }
 
     @Test
-    public void userBirthdayInFuture(){
+    public void userBirthdayInFuture() {
         User user = new User();
         user.setId(1L);
         user.setLogin("login");
@@ -109,7 +108,7 @@ public class UserValidationTest {
     }
 
     @Test
-    public void userBirthdayIsToday(){
+    public void userBirthdayIsToday() {
         User user = new User();
         user.setId(1L);
         user.setLogin("login");
