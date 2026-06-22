@@ -29,6 +29,7 @@ public class ExceptionHandlers {
         return Map.of("error", e.getMessage());
     }
 
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleInternalServerError(final Exception e) {

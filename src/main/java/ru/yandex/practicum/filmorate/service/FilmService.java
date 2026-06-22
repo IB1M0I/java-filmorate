@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -45,12 +47,19 @@ public class FilmService {
         return film;
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public Film deleteLike(long id, long userId) {
         log.trace("Вызван метод removeLike");
 
         if (filmStorage.findById(id) == null) {
             log.error("Фильм с id = {} не найден, удалять нечего", id);
             throw new NotFoundException(String.format("Фильм с id = %d не найден, удалять нечего", id));
+        }
+
+        if(userStorage.findById(userId) == null){
+            log.error("Пользователь с id = {} не найден, удалять нечего", userId);
+            throw new NotFoundException(String.format("Пользователь с id = %d не найден, удалять нечего", userId));
+
         }
 
         Film film = filmStorage.findById(id);
