@@ -56,7 +56,7 @@ public class FilmService {
             throw new NotFoundException(String.format("Фильм с id = %d не найден, удалять нечего", id));
         }
 
-        if(userStorage.findById(userId) == null){
+        if (userStorage.findById(userId) == null) {
             log.error("Пользователь с id = {} не найден, удалять нечего", userId);
             throw new NotFoundException(String.format("Пользователь с id = %d не найден, удалять нечего", userId));
 
