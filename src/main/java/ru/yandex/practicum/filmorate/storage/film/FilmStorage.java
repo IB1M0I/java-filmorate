@@ -10,7 +10,7 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
-    ResponseEntity<byte[]> deleteFilm(long id);
+    void deleteFilm(long id);
 
     Film findById(long id);
 

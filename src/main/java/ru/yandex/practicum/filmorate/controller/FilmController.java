@@ -55,18 +55,18 @@ public class FilmController {
 
     //Поставить лайк фильму
     @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity<byte[]> likeFilm(@PathVariable long id, @PathVariable long userId) {
+    public Film likeFilm(@PathVariable long id, @PathVariable long userId) {
         return filmService.likeFilm(id, userId);
     }
 
     //Удалить фильм
     @DeleteMapping
-    public ResponseEntity<byte[]> deleteFilm(@PathVariable long id) {
-        return filmService.deleteFilm(id);
+    public void deleteFilm(@PathVariable long id) {
+        filmService.deleteFilm(id);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<byte[]> deleteLike(@PathVariable long id, @PathVariable long userId) {
+    public Film deleteLike(@PathVariable long id, @PathVariable long userId) {
         return filmService.deleteLike(id, userId);
     }
 

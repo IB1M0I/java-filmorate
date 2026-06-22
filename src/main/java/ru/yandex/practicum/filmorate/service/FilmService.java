@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -24,7 +25,7 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public ResponseEntity<byte[]> likeFilm(long id, long userId) {
+    public Film likeFilm(long id, long userId) {
         log.trace("Вызван метод likeFilm");
 
         if (filmStorage.findById(id) == null) {
@@ -40,14 +41,14 @@ public class FilmService {
         Film film = filmStorage.findById(id);
         if (film.getLikes().contains(userId)) {
             log.info("Пользователь " + userId + " уже оставил лайк для фильма " + film.getName());
-            return new ResponseEntity<>(String.format("Вы уже оставили лайк для фильма %s", film.getName()).getBytes(StandardCharsets.UTF_8), HttpStatus.CONFLICT);
+            throw new ValidationException("Пользователь " + userId + " уже оставил лайк для фильма " + film.getName());
         }
         film.getLikes().add(userId);
         log.info("Фильму " + film.getName() + " добавлен лайк");
-        return new ResponseEntity<>(String.format("Фильму %s добавлен лайк", film.getName()).getBytes(StandardCharsets.UTF_8), HttpStatus.OK);
+        return film;
     }
 
-    public ResponseEntity<byte[]> deleteLike(long id, long userId) {
+    public Film deleteLike(long id, long userId) {
         log.trace("Вызван метод removeLike");
 
         if (filmStorage.findById(id) == null) {
@@ -57,11 +58,11 @@ public class FilmService {
 
         Film film = filmStorage.findById(id);
         if (!film.getLikes().contains(userId)) {
-            return new ResponseEntity<>(String.format("Вы еще не оценивали фильм %s", film.getName()).getBytes(StandardCharsets.UTF_8), HttpStatus.CONFLICT);
+            throw new ValidationException("Вы еще не оценивали фильм " + film.getName());
         }
 
         film.getLikes().remove(userId);
-        return new ResponseEntity<>(String.format("Вы удалили свою оценку фильму %s", film.getName()).getBytes(StandardCharsets.UTF_8), HttpStatus.OK);
+        return film;
     }
 
     public Collection<Film> getPopular(int count) {
@@ -82,8 +83,8 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public ResponseEntity<byte[]> deleteFilm(long id) {
-        return filmStorage.deleteFilm(id);
+    public void deleteFilm(long id) {
+        filmStorage.deleteFilm(id);
     }
 
     public Collection<Film> findAll() {

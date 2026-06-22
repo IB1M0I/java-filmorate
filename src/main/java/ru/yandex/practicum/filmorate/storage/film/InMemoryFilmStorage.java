@@ -74,7 +74,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     //Удалить фильм
     @Override
-    public ResponseEntity<byte[]> deleteFilm(long id) {
+    public void deleteFilm(long id) {
         log.trace("Вызван метод удаления фильма");
         log.debug("id = {}", id);
 
@@ -83,10 +83,8 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException(String.format("Фильм с id = %d не найден", id));
         }
 
-        ResponseEntity<byte[]> response = new ResponseEntity<>(String.format("Фильм %s удален", films.get(id)).getBytes(StandardCharsets.UTF_8), HttpStatus.OK);
         films.remove(id);
         log.info("Фильма с id = {} удален", id);
-        return response;
     }
 
     //Получить все фильмы
