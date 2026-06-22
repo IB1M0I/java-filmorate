@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
 
@@ -12,43 +14,61 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private final FilmStorage filmStorage;
+    private final FilmService filmService;
 
-    public FilmController(FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
     }
 
-
+    //Получить все фильмы
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public Collection<Film> findAll() {
-        return filmStorage.findAll();
+        return filmService.findAll();
     }
 
+    //Получить фильм по id
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public Film findById(@PathVariable long id) {
-        return filmStorage.findById(id);
+        return filmService.findById(id);
     }
 
-    //Добавить пользователя
+    @GetMapping("/popular")
+    public Collection<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
+        return filmService.getPopular(count);
+    }
+
+    //Добавить фильм
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Film addFilm(@Valid @RequestBody Film film) {
-        return filmStorage.addFilm(film);
+        return filmService.addFilm(film);
     }
 
+    //Обновить информацию о фильме
     @PutMapping
+    @ResponseStatus(HttpStatus.OK)
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return filmStorage.updateFilm(film);
+        return filmService.updateFilm(film);
     }
 
+    //Поставить лайк фильму
+    @PutMapping("/{id}/like/{userId}")
+    public ResponseEntity<byte[]> likeFilm(@PathVariable long id, @PathVariable long userId) {
+        return filmService.likeFilm(id, userId);
+    }
+
+    //Удалить фильм
     @DeleteMapping
-    public Film deleteFilm(@PathVariable long id) {
-        return filmStorage.deleteFilm(id);
+    public ResponseEntity<byte[]> deleteFilm(@PathVariable long id) {
+        return filmService.deleteFilm(id);
     }
 
-
-
-
-
+    @DeleteMapping("/{id}/like/{userId}")
+    public ResponseEntity<byte[]> deleteLike(@PathVariable long id, @PathVariable long userId) {
+        return filmService.deleteLike(id, userId);
+    }
 
 
 }

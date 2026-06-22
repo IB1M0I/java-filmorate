@@ -1,10 +1,15 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +22,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     //Добавить фильм
     @Override
-    public Film addFilm(Film film) {
+    public Film addFilm(@Valid Film film) {
         log.trace("Вызван метод добавления фильма");
         log.debug("film = {}", film);
 
@@ -33,6 +38,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
+
+    //Обновить информацию о фильме
     @Override
     public Film updateFilm(Film film) {
         log.trace("Вызван метод обновления фильма");
@@ -48,7 +55,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (!films.containsKey(film.getId())) {
             log.error("Фильм с id = {} не найдет", film.getId());
-            throw new ValidationException(String.format("Фильм с %d не найдет", film.getId()));
+            throw new NotFoundException(String.format("Фильм с %d не найдет", film.getId()));
         }
 
         Film oldFilm = films.get(film.getId());
@@ -65,31 +72,36 @@ public class InMemoryFilmStorage implements FilmStorage {
         return oldFilm;
     }
 
+    //Удалить фильм
     @Override
-    public Film deleteFilm(long id) {
+    public ResponseEntity<byte[]> deleteFilm(long id) {
         log.trace("Вызван метод удаления фильма");
         log.debug("id = {}", id);
 
-        if (films.containsKey(id)) {
+        if (!films.containsKey(id)) {
             log.error("Фильм с id = {} не найден", id);
-            throw new ValidationException(String.format("Фильм с id = %d не найден", id));
+            throw new NotFoundException(String.format("Фильм с id = %d не найден", id));
         }
 
+        ResponseEntity<byte[]> response = new ResponseEntity<>(String.format("Фильм %s удален", films.get(id)).getBytes(StandardCharsets.UTF_8), HttpStatus.OK);
         films.remove(id);
         log.info("Фильма с id = {} удален", id);
-        return null;
+        return response;
     }
 
+    //Получить все фильмы
     @Override
     public Film findById(long id) {
-        if(!films.containsKey(id)){
-            log.error("ФИльм с id = {} не найден", id);
-            throw new ValidationException(String.format("Фильм с id = %d не найден", id));
+        log.trace("Вызван метод findById");
+        if (!films.containsKey(id)) {
+            log.error("Фильм с id = {} не найден", id);
+            throw new NotFoundException(String.format("Фильм с id = %d не найден", id));
         }
 
         return films.get(id);
     }
 
+    //Получить фильм по id
     @Override
     public Collection<Film> findAll() {
         log.trace("Вызван метод получения списка фильма");
@@ -97,6 +109,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     }
 
+    //Генерации id
     private long getNextId() {
         long currentId = films.keySet().stream().mapToLong(id -> id).max().orElse(0L);
         log.trace("Сгенерирован новый id");
