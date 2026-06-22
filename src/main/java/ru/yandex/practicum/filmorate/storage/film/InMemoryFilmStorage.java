@@ -2,14 +2,11 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
