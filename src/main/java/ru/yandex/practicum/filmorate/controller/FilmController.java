@@ -59,7 +59,7 @@ public class FilmController {
     }
 
     //Удалить фильм
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public void deleteFilm(@PathVariable long id) {
         filmService.deleteFilm(id);
     }

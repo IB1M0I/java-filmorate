@@ -82,9 +82,11 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
         }
 
+        User user = users.get(id);
+
         users.remove(id);
         log.info("Пользователь с id = {} удален", id);
-        return null;
+        return user;
     }
 
     //Получить пользователя по id
