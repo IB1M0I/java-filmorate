@@ -10,16 +10,16 @@ import java.util.Set;
 
 @Data
 public class User {
-    Long id; //ID пользователя
+    private Long id; //ID пользователя
 
     @Email(message = "Введен не верный формат почты")
-    String email; //Почта пользователя
+    private String email; //Почта пользователя
 
-    String login; //Логин пользователя
-    String name; //Отображаемое имя
+    private String login; //Логин пользователя
+    private String name; //Отображаемое имя
 
     @PastOrPresent(message = "Дата рождения не может быть указана в будущем")
-    LocalDate birthday; //День рождения
+    private LocalDate birthday; //День рождения
 
-    Set<Long> friends = new HashSet<>();
+    private Set<Long> friends = new HashSet<>();
 }

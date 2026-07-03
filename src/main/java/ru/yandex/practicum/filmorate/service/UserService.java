@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -17,33 +18,45 @@ public class UserService {
 
     //Добавить друга
     public User addFriend(long id, long friendId) {
-        if (userStorage.findById(id) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
-        }
-        if (userStorage.findById(friendId) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", friendId));
-        }
-
         User user = userStorage.findById(id);
         User friend = userStorage.findById(friendId);
+
+        if (user == null) {
+            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
+        }
+        if (friend == null) {
+            throw new NotFoundException(String.format("Пользователь с id = %d не найден", friendId));
+        }
+        if(id == friendId){
+            throw new ValidationException("Нельзя добавить самого себя в друзья");
+        }
+
+
+
+        if(user.getFriends().contains(friendId)){
+            throw new ValidationException("Пользователь с id = " + friendId + " уже добавлен в друзья");
+        }
+
         user.getFriends().add(friendId);
-        friend.getFriends().add(id);
         return user;
     }
 
     //Удалить друга
     public User deleteFriend(long id, long friendId) {
-        if (userStorage.findById(id) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
-        }
-        if (userStorage.findById(friendId) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", friendId));
-        }
-
         User user = userStorage.findById(id);
         User friend = userStorage.findById(friendId);
+
+        if (user == null) {
+            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
+        }
+        if (friend == null) {
+            throw new NotFoundException(String.format("Пользователь с id = %d не найден", friendId));
+        }
+        if(!user.getFriends().contains(friendId)){
+            throw new ValidationException("Пользователь с id = " + friendId + " не добавлен в друзья");
+        }
+
         user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
 
         return user;
     }

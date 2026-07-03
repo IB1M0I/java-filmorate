@@ -12,19 +12,23 @@ import java.util.Set;
 
 @Data
 public class Film {
-    Long id; //ID фильма
+    private Long id; //ID фильма
 
     @NotBlank(message = "Название фильма не может быть пустым")
-    String name; //Название фильма
+    private String name; //Название фильма
 
     @Size(max = 200, message = "Описание фильма не может быть более 200 символов")
-    String description; //Описание фильма
+    private String description; //Описание фильма
 
-    LocalDate releaseDate; //Дата выпуска фильма
+    private LocalDate releaseDate; //Дата выпуска фильма
 
     @Positive(message = "Длительность фильма не может быть 0")
-    Integer duration; //Продолжительность фильма
+    private Integer duration; //Продолжительность фильма
 
-    Set<Long> likes = new HashSet<>();
+    private Set<Genre> genre = new HashSet<>(); //Жанры
+
+    private MpaRating mpaRating; //MPA рейтинг
+
+    private Set<Long> likes = new HashSet<>(); //Лайки
 
 }
