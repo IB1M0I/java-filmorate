@@ -3,6 +3,25 @@ Template repository for Filmorate project.
 
 ![Схема базы данных](images/database_schema.png)
 
+Описание базы данных
+
+База данных хранит информацию о фильмах, пользователях и их взаимодействии.
+Таблицы:
++ films — фильмы: название, описание, дата выхода, длительность, рейтинг MPA
++ users — пользователи: email, логин, имя, дата рождения
++ mpa_rating — справочник рейтингов MPA (G, PG, PG-13, R, NC-17)
++ genres — справочник жанров
++ movie_genres — связь фильмов и жанров (многие ко многим)
++ likes_movies — лайки пользователей к фильмам (многие ко многим)
++ friendships — связи между пользователями: user_id, friend_id, is_confirmed (подтверждена ли дружба)
+
+Ключевые связи:
+
++ У фильма один рейтинг MPA, но много жанров
++ Пользователь может лайкать много фильмов
++ Дружба сохраняется в одном направлении — подтвержденная дружба означает, что оба добавили друг друга
+
+
 Запрос на популярные фильмы
 ```
 SELECT f.id, f.name, COUNT(lm.film_id)
@@ -10,13 +29,14 @@ FROM films AS f
 LEFT OUTER JOIN likes_movies AS lm ON f.id = lm.film_id
 GROUP BY f.id, f.name
 ORDER BY COUNT(lm.film_id) DESC
+LIMIT 3
 ```
 
 Запрос на конкретный фильм (id = 1)
 ```
 SELECT f.name, f.description, f."releaseDate", mr.name
 FROM films AS f
-JOIN mpa_rating AS mr ON f.mpa_rating = mr.id
+JOIN mpa_rating AS mr ON f.mpa_rating_id = mr.id
 WHERE f.id = 1
 ```
 
