@@ -1,31 +1,39 @@
 package ru.yandex.practicum.filmorate.model;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 
+import java.util.Objects;
+
 @Getter
-public enum MpaRating {
-    G(1, "G"),
-    PG(2, "PG"),
-    PG_13(3, "PG-13"),
-    R(4, "R"),
-    NC_17(5, "NC-17");
+@NoArgsConstructor(force = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class MpaRating {
+    private  int id;
+    private String name;
 
-    private final int id;
-    private final String name;
+    public MpaRating(int id){
+        this.id = id;
 
-    MpaRating(int id, String name) {
+    }
+    public MpaRating(int id, String name){
         this.id = id;
         this.name = name;
     }
 
-    public static MpaRating fromId(int id) {
-        for (MpaRating rating : MpaRating.values()) {
-            if (rating.getId() == id) {
-                return rating;
-            }
-        }
-        throw new ValidationException("Неверный ID рейтинга: " + id);
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        MpaRating mpaRating = (MpaRating) o;
+        return id == mpaRating.id && Objects.equals(name, mpaRating.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

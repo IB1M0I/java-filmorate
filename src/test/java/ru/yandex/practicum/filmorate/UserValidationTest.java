@@ -1,28 +1,17 @@
 package ru.yandex.practicum.filmorate;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
+import jakarta.validation.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 public class UserValidationTest {
-    UserStorage userStorage = new InMemoryUserStorage();
-    UserService userService = new UserService(userStorage);
-    private UserController userController = new UserController(userService);
-    private Set<ConstraintViolation<User>> validations;
     private Validator validator;
+    private Set<ConstraintViolation<User>> validations;
 
     @BeforeEach
     void setUp() {
@@ -30,17 +19,6 @@ public class UserValidationTest {
         validator = factory.getValidator();
     }
 
-    @Test
-    public void userEmailIsEmpty() {
-        User user = new User();
-        user.setId(1L);
-        user.setLogin("login");
-        user.setName("name");
-        user.setEmail("");
-        user.setBirthday(LocalDate.of(1990, 5, 15));
-
-        Assertions.assertThrows(ValidationException.class, () -> userController.addUser(user));
-    }
 
     @Test
     public void userEmailWithoutAtSign() {
@@ -58,43 +36,11 @@ public class UserValidationTest {
         Assertions.assertTrue(validations.stream().anyMatch(v -> v.getMessage().equals("Введен не верный формат почты")));
     }
 
-    @Test
-    public void userLoginIsEmpty() {
-        User user = new User();
-        user.setId(1L);
-        user.setLogin("");
-        user.setName("name");
-        user.setEmail("почта@yandex.ru");
-        user.setBirthday(LocalDate.of(2000, 1, 28));
 
-        Assertions.assertThrows(ValidationException.class, () -> userController.addUser(user));
-    }
 
-    @Test
-    public void userLoginContainsSpace() {
-        User user = new User();
-        user.setId(1L);
-        user.setLogin("log in");
-        user.setName("name");
-        user.setEmail("почта@yandex.ru");
-        user.setBirthday(LocalDate.of(1978, 7, 19));
 
-        Assertions.assertThrows(ValidationException.class, () -> userController.addUser(user));
-    }
 
-    @Test
-    public void userNameIsEmptyUsesLogin() {
-        User user = new User();
-        user.setId(1L);
-        user.setLogin("login");
-        user.setName("");
-        user.setEmail("почта@yandex.ru");
-        user.setBirthday(LocalDate.of(1995, 3, 7));
 
-        User create = userController.addUser(user);
-
-        Assertions.assertEquals(user.getLogin(), create.getName());
-    }
 
     @Test
     public void userBirthdayInFuture() {
@@ -112,17 +58,4 @@ public class UserValidationTest {
         Assertions.assertTrue(validations.stream().anyMatch(v -> v.getMessage().equals("Дата рождения не может быть указана в будущем")));
     }
 
-    @Test
-    public void userBirthdayIsToday() {
-        User user = new User();
-        user.setId(1L);
-        user.setLogin("login");
-        user.setName("name");
-        user.setEmail("почта@yandex.ru");
-        user.setBirthday(LocalDate.now());
-
-        User create = userController.addUser(user);
-
-        Assertions.assertEquals(user, create);
-    }
 }

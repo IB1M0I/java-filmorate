@@ -3,14 +3,21 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Film {
     private Long id; //ID фильма
 
@@ -25,10 +32,11 @@ public class Film {
     @Positive(message = "Длительность фильма не может быть 0")
     private Integer duration; //Продолжительность фильма
 
-    private Set<Genre> genre = new HashSet<>(); //Жанры
+    private LinkedHashSet<Genre> genre = new LinkedHashSet<>(); //Жанры
 
-    private MpaRating mpaRating; //MPA рейтинг
+    private MpaRating mpa; //MPA рейтинг
 
     private Set<Long> likes = new HashSet<>(); //Лайки
+
 
 }
