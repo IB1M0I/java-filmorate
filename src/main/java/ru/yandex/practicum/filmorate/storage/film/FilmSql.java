@@ -20,13 +20,27 @@ public class FilmSql {
             VALUES (?, ?);""";
     static final String DELETE_LIKE = "DELETE FROM likes_movies WHERE film_id = ? AND user_id = ?";
     static final String FIND_POPULAR = """
-            SELECT f.*
+            SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
             FROM films AS f
             LEFT JOIN likes_movies AS lm ON f.id = lm.film_id
-            GROUP BY f.id
-            ORDER BY COUNT(lm.user_id) DESC
+            GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
+            ORDER BY COUNT(lm.film_id) DESC, f.id ASC
             LIMIT ?""";
     static final String GET_LIKES_BY_FILM_ID = "SELECT user_id FROM likes_movies WHERE film_id = ?";
+    static final String GET_POPULAL = """
+            SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id,
+                   g.id AS genre_id, g.name AS genre_name
+            FROM (
+                SELECT films.*
+                FROM films
+                LEFT JOIN likes_movies ON films.id = likes_movies.film_id
+                GROUP BY films.id
+                ORDER BY COUNT(likes_movies.user_id) DESC
+                LIMIT ?
+            ) AS f
+            LEFT JOIN film_genres AS fg ON f.id = fg.film_id
+            LEFT JOIN genres AS g ON fg.genre_id = g.id
+            """;
 
     static final String CHECK_MPA_ID = "SELECT COUNT(*) FROM mpa_rating WHERE id = ?";
     static final String CHEK_GENRE_ID = "SELECT COUNT(*) FROM genres WHERE id = ?";

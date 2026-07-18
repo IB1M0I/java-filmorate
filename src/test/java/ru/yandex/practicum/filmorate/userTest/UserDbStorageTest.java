@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
 
 import java.time.LocalDate;
 import java.util.Collection;
