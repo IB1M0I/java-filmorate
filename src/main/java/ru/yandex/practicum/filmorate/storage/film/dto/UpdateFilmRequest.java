@@ -1,20 +1,16 @@
 package ru.yandex.practicum.filmorate.storage.film.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Data
 @Builder
 public class UpdateFilmRequest {
-//    @NotNull
     private Long id;
     private String name;
     private String description;

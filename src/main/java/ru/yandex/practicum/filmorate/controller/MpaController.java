@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
 import java.util.Collection;
 
@@ -16,6 +15,7 @@ import java.util.Collection;
 @RequestMapping("/mpa")
 public class MpaController {
     private final FilmService filmService;
+
     @GetMapping
     public Collection<MpaRating> findAllMpa() {
         return filmService.findAllMpa();

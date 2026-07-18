@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.userTest;
 
 import jakarta.validation.*;
 import org.junit.jupiter.api.Assertions;

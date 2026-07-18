@@ -8,31 +8,34 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
+import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmRowMapper;
+import ru.yandex.practicum.filmorate.storage.film.FilmSql;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.Collection;
 
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({FilmDbStorage.class, FilmRowMapper.class})
-public class FilmDbStorageTest {
+public class FilmDbStorageTest extends FilmSql {
     private final FilmDbStorage filmStorage;
+
     @Test
-    public void createFilmTest(){
+    public void createFilmTest() {
         Film film = Film.builder()
                 .name("Фильм")
                 .description("Описание")
                 .releaseDate(LocalDate.now())
                 .duration(120)
-                .genre(new LinkedHashSet<>(Set.of(new Genre(1))))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(1))))
                 .mpa(new MpaRating(1))
                 .build();
         Film filmSave = filmStorage.addFilm(film);
@@ -48,13 +51,13 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    public void testFindFilmById(){
+    public void testFindFilmById() {
         Film film1 = Film.builder()
                 .name("Фильм")
                 .description("Описание")
                 .duration(100)
                 .releaseDate(LocalDate.now())
-                .genre(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
                 .mpa(new MpaRating(3))
                 .build();
         Film film2 = Film.builder()
@@ -62,7 +65,7 @@ public class FilmDbStorageTest {
                 .description("Описание2")
                 .duration(200)
                 .releaseDate(LocalDate.now())
-                .genre(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
                 .mpa(new MpaRating(1))
                 .build();
 
@@ -81,19 +84,19 @@ public class FilmDbStorageTest {
         Assertions.assertThat(findFilm.getMpa()).isNotNull();
         Assertions.assertThat(findFilm.getMpa().getId()).isEqualTo(1);
 
-        Assertions.assertThat(findFilm.getGenre()).isNotEmpty();
-        Assertions.assertThat(findFilm.getGenre().iterator().next().getId()).isEqualTo(4);
+        Assertions.assertThat(findFilm.getGenres()).isNotEmpty();
+        Assertions.assertThat(findFilm.getGenres().iterator().next().getId()).isEqualTo(4);
 
     }
 
     @Test
-    public void testFindUserById_NotFound(){
+    public void testFindUserById_NotFound() {
         Film film = Film.builder()
                 .name("Фильм")
                 .description("Описание")
                 .duration(100)
                 .releaseDate(LocalDate.now())
-                .genre(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
                 .mpa(new MpaRating(3))
                 .build();
 
@@ -104,13 +107,13 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    public void testUpdateFilm(){
+    public void testUpdateFilm() {
         Film film = Film.builder()
                 .name("Фильм")
                 .description("Описание")
                 .duration(100)
                 .releaseDate(LocalDate.now())
-                .genre(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
                 .mpa(new MpaRating(3))
                 .build();
         Film saveFilm = filmStorage.addFilm(film);
@@ -120,9 +123,9 @@ public class FilmDbStorageTest {
                 .name("Update Film")
                 .description("Update description")
                 .duration(200)
-                .genre(new LinkedHashSet<>(Set.of(new Genre(1),new Genre(2))))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(1), new Genre(2))))
                 .mpa(new MpaRating(1))
-                .releaseDate(LocalDate.of(2000,1,1))
+                .releaseDate(LocalDate.of(2000, 1, 1))
                 .build();
 
         filmStorage.updateFilm(updateFilm);
@@ -130,22 +133,22 @@ public class FilmDbStorageTest {
         Assertions.assertThat(respone).isNotNull();
         Assertions.assertThat(respone.getId()).isEqualTo(film.getId());
         Assertions.assertThat(respone.getName()).isEqualTo("Update Film");
-        Assertions.assertThat(respone.getReleaseDate()).isEqualTo(LocalDate.of(2000,1,1));
+        Assertions.assertThat(respone.getReleaseDate()).isEqualTo(LocalDate.of(2000, 1, 1));
         Assertions.assertThat(respone.getDuration()).isEqualTo(200);
-        Assertions.assertThat(respone.getGenre()).isNotNull();
-        Assertions.assertThat(respone.getGenre()).isEqualTo(Set.of(new Genre(1,"Комедия"),new Genre(2,"Драма")));
+        Assertions.assertThat(respone.getGenres()).isNotNull();
+        Assertions.assertThat(respone.getGenres()).isEqualTo(Set.of(new Genre(1, "Комедия"), new Genre(2, "Драма")));
         Assertions.assertThat(respone.getMpa()).isNotNull();
         Assertions.assertThat(respone.getMpa().getId()).isEqualTo(1);
     }
 
     @Test
-    public void testFindAllFilms(){
+    public void testFindAllFilms() {
         Film film1 = Film.builder()
                 .name("Фильм")
                 .description("Описание")
                 .duration(100)
                 .releaseDate(LocalDate.now())
-                .genre(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
                 .mpa(new MpaRating(3))
                 .build();
         Film film2 = Film.builder()
@@ -153,7 +156,7 @@ public class FilmDbStorageTest {
                 .description("Описание2")
                 .duration(200)
                 .releaseDate(LocalDate.now())
-                .genre(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
                 .mpa(new MpaRating(1))
                 .build();
         Film film3 = Film.builder()
@@ -161,7 +164,7 @@ public class FilmDbStorageTest {
                 .description("Описание3")
                 .duration(100)
                 .releaseDate(LocalDate.now())
-                .genre(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
                 .mpa(new MpaRating(3))
                 .build();
 
@@ -174,5 +177,18 @@ public class FilmDbStorageTest {
         Assertions.assertThat(films).isNotNull();
         Assertions.assertThat(films).hasSize(3);
 
+    }
+
+    @Test
+    public void filmReleaseDateBeforeFirstFilm() {
+        Film film = new Film();
+
+        film.setId(1L);
+        film.setName("Фильм");
+        film.setReleaseDate(LocalDate.of(1895, 12, 27));
+        film.setDuration(120);
+        film.setDescription("Описание");
+
+        Assertions.assertThatThrownBy(() -> filmStorage.addFilm(film)).isInstanceOf(ValidationException.class);
     }
 }

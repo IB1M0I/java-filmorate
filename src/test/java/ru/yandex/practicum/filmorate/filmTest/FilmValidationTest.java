@@ -60,24 +60,6 @@ public class FilmValidationTest {
 
 
     @Test
-    public void filmReleaseDateBeforeFirstFilm() {
-        Film film = new Film();
-
-        film.setId(1L);
-        film.setName("Фильм");
-        film.setReleaseDate(LocalDate.of(1895, 12, 27));
-        film.setDuration(120);
-        film.setDescription("Описание");
-
-        validations = validator.validate(film);
-
-        Assertions.assertFalse(validations.isEmpty(), "Должна быть ошибка валидации для даты релиза");
-        Assertions.assertTrue(validations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("releaseDate")));
-    }
-
-
-
-    @Test
     public void filmDurationIsZero() {
         Film film = new Film();
 

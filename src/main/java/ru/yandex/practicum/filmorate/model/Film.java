@@ -32,7 +32,7 @@ public class Film {
     @Positive(message = "Длительность фильма не может быть 0")
     private Integer duration; //Продолжительность фильма
 
-    private LinkedHashSet<Genre> genre = new LinkedHashSet<>(); //Жанры
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>(); //Жанры
 
     private MpaRating mpa; //MPA рейтинг
 

@@ -20,44 +20,16 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static ru.yandex.practicum.filmorate.storage.film.FilmSql.*;
+
 @Repository
 @Primary
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final RowMapper<Film> rowMapper;
     private final JdbcTemplate jdbc;
-    private final String INSERT_FILM = "INSERT INTO films (name, description, release_date, duration, mpa_rating_id) VALUES (?,?,?,?,?)";
-    private final String FIND_ALL_FILMS = "SELECT * FROM FILMS";
-    private final String FIND_FILM_BY_ID = "SELECT * FROM films WHERE id = ?";
-    private final String UPDATE_FILM = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ? WHERE id = ?";
-    private final String DELETE_FILM = "DELETE FROM films WHERE id = ?";
-    //TODO исправить movie_genre на genres, и genre на genres в shema.sql
-    private final String INSERT_GENRE_TO_FILM = "MERGE INTO movie_genre (film_id, genre_id) KEY (film_id,genre_id) VALUES (?,?)";
-    private final String GET_GENRE_BY_FILM_ID = "SELECT g.id, g.name\n" +
-            "FROM movie_genre AS mg\n" +
-            "JOIN genre AS g ON mg.genre_id = g.id\n" +
-            "WHERE mg.film_id = ?";
 
-    private final String LIKE_FILM = "MERGE INTO likes_movies (film_id, user_id) \n" +
-            "KEY(film_id, user_id) \n" +
-            "VALUES (?, ?);";
-    private final String DELETE_LIKE = "DELETE FROM likes_movies WHERE film_id = ? AND user_id = ?";
-    private final String FIND_POPULAR = "SELECT f.*\n" +
-            "FROM films AS f\n" +
-            "LEFT JOIN likes_movies AS lm ON f.id = lm.film_id\n" +
-            "GROUP BY f.id\n" +
-            "ORDER BY COUNT(lm.user_id) DESC\n" +
-            "LIMIT ?";
-    private final String GET_LIKES_BY_FILM_ID = "SELECT user_id FROM likes_movies WHERE film_id = ?";
 
-    private final String CHECK_MPA_ID = "SELECT COUNT(*) FROM MPA_RATING WHERE id = ?";
-    private final String CHEK_GENRE_ID = "SELECT COUNT(*) FROM GENRE WHERE id = ?";
-
-    private final String FIND_ALL_MPA = "SELECT * FROM MPA_RATING";
-    private final String FIND_BY_ID_MPA = "SELECT * FROM MPA_RATING WHERE id = ?";
-
-    private final String FIND_ALL_GENRE = "SELECT * FROM GENRE";
-    private final String FIND_BY_ID_GENRE = "SELECT * FROM GENRE WHERE id = ?";
 
     @Override
     public Film addFilm(Film film) {
@@ -65,19 +37,19 @@ public class FilmDbStorage implements FilmStorage {
             throw new ValidationException("Дата выпуска фильма не может быть раньше 28 декабря 1895 года");
         }
 
-        if(film.getMpa() !=null){
+        if (film.getMpa() != null) {
             checkMpa(film.getMpa().getId());
-        }else {
+        } else {
             throw new ValidationException("Рейтинг MPA не может быть пустым");
         }
 
 
-        if(film.getGenre() != null){
-            film.getGenre().stream()
+        if (film.getGenres() != null) {
+            film.getGenres().stream()
                     .map(Genre::getId)
                     .forEach(id -> checkGenre(id));
-        }else{
-            throw new ValidationException("Жанры не могут быть пустыми");
+        } else {
+            film.setGenres(new LinkedHashSet<>());
         }
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(con -> {
@@ -94,12 +66,12 @@ public class FilmDbStorage implements FilmStorage {
         Long id = keyHolder.getKeyAs(Long.class);
         if (id != null) {
             film.setId(id);
-            if (film.getGenre() != null) {
-                for (Genre genre : film.getGenre()) {
+            if (film.getGenres() != null) {
+                for (Genre genre : film.getGenres()) {
                     jdbc.update(INSERT_GENRE_TO_FILM, film.getId(), genre.getId());
                 }
             } else {
-                film.setGenre(new LinkedHashSet<>());
+                film.setGenres(new LinkedHashSet<>());
             }
         } else {
             throw new RuntimeException("Не удалось сохранить фильм и получить id");
@@ -119,7 +91,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getMpa().getId(),
                 film.getId());
-        for (Genre genre : film.getGenre()) {
+        for (Genre genre : film.getGenres()) {
             jdbc.update(INSERT_GENRE_TO_FILM, film.getId(), genre.getId());
         }
         return film;
@@ -180,8 +152,8 @@ public class FilmDbStorage implements FilmStorage {
         }, film.getId()));
 
         film.setLikes(likes);
-        film.setGenre(genres);
-        MpaRating mpa = jdbc.queryForObject(FIND_BY_ID_MPA,(rs, rowNum) -> new MpaRating(rs.getInt("id"),rs.getString("name")), film.getMpa().getId());
+        film.setGenres(genres);
+        MpaRating mpa = jdbc.queryForObject(FIND_BY_ID_MPA, (rs, rowNum) -> new MpaRating(rs.getInt("id"), rs.getString("name")), film.getMpa().getId());
         film.setMpa(mpa);
 
 
@@ -191,11 +163,11 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> getLikesAndGenresByFilmId(Collection<Film> films) {
         for (Film film : films) {
             HashSet<Long> likes = new HashSet<>(jdbc.query(GET_LIKES_BY_FILM_ID, (rs, rowMapper) -> rs.getLong("user_id"), film.getId()));
-            HashSet<Genre> genres = new HashSet<>(jdbc.query(GET_GENRE_BY_FILM_ID, (rs, rowMapper) -> {
-                Genre genre = new Genre();
-                genre.setId(rs.getInt("id"));
-                return genre;
-            }, film.getId()));
+//            HashSet<Genre> genres = new HashSet<>(jdbc.query(GET_GENRE_BY_FILM_ID, (rs, rowMapper) -> {
+//                Genre genre = new Genre();
+//                genre.setId(rs.getInt("id"));
+//                return genre;
+//            }, film.getId()));
             film.setLikes(likes);
         }
         return films;
@@ -210,12 +182,10 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public Collection<Genre> findAllGenres() {
-        return jdbc.query(FIND_ALL_GENRE, (rs,rowMapper)-> new Genre(rs.getInt("id"),rs.getString("name")));
+        return jdbc.query(FIND_ALL_GENRE, (rs, rowMapper) -> new Genre(rs.getInt("id"), rs.getString("name")));
     }
 
     public Genre findGenreById(long id) {
-        Genre genre = jdbc.queryForObject(FIND_BY_ID_GENRE, (rs, rowNum) -> new Genre(rs.getInt("id"), rs.getString("name")), id);
-
-        return genre;
+        return jdbc.queryForObject(FIND_BY_ID_GENRE, (rs, rowNum) -> new Genre(rs.getInt("id"), rs.getString("name")), id);
     }
 }

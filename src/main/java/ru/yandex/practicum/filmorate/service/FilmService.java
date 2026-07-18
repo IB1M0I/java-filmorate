@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
@@ -115,6 +114,6 @@ public class FilmService {
     }
 
     public Genre findGenreById(long id) {
-    return filmStorage.findGenreById(id);
+        return filmStorage.findGenreById(id);
     }
 }

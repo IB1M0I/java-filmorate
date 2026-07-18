@@ -22,7 +22,7 @@ public class NewFilmRequest {
     private LocalDate releaseDate;
     @Positive(message = "Длительность фильма не может быть 0")
     private int duration;
-    private LinkedHashSet<Genre> genre;
+    private LinkedHashSet<Genre> genres;
     private Set<Long> likes;
     private MpaRating mpa;
 }

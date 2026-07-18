@@ -19,7 +19,7 @@ public class UserMapper {
         return userDto;
     }
 
-    public static User mapToUser(NewUserRequest request){
+    public static User mapToUser(NewUserRequest request) {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setLogin(request.getLogin());
@@ -28,17 +28,17 @@ public class UserMapper {
         return user;
     }
 
-    public static User mapToUpdate(User user,UpdateUserRequest request) {
-        if(request.hasName()){
+    public static User mapToUpdate(User user, UpdateUserRequest request) {
+        if (request.hasName()) {
             user.setName(request.getName());
         }
-        if(request.hasEmail()){
+        if (request.hasEmail()) {
             user.setEmail(request.getEmail());
         }
-        if(request.hasBirthday()){
+        if (request.hasBirthday()) {
             user.setBirthday(request.getBirthday());
         }
-        if(request.hasLogin()){
+        if (request.hasLogin()) {
             user.setLogin(request.getLogin());
         }
         return user;

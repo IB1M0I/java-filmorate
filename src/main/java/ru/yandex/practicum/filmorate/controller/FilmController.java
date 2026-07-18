@@ -65,13 +65,11 @@ public class FilmController {
     public Film deleteLike(@PathVariable long id, @PathVariable long userId) {
         return filmService.deleteLike(id, userId);
     }
+
     @GetMapping("/popular")
     public Collection<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
         return filmService.getPopular(count);
     }
-
-
-
 
 
 }
