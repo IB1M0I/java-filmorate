@@ -191,7 +191,7 @@ public class FilmDbStorage implements FilmStorage {
             }
         }, filmIds);
 
-        String get_like = "SELECT film_id, user_id FROM likes_movies " +
+        String getLike = "SELECT film_id, user_id FROM likes_movies " +
                 "WHERE film_id IN (" + inClause + ")";
 
         jdbc.query(get_like, (rs) -> {
@@ -204,7 +204,7 @@ public class FilmDbStorage implements FilmStorage {
             }
         }, filmIds);
 
-        String get_mpa = "SELECT f.id AS film_id, m.id AS mpa_id, m.name AS mpa_name " +
+        String getMpa = "SELECT f.id AS film_id, m.id AS mpa_id, m.name AS mpa_name " +
                 "FROM films f " +
                 "JOIN mpa_rating m ON f.mpa_rating_id = m.id " +
                 "WHERE f.id IN (" + inClause + ")";
