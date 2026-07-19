@@ -1,103 +1,148 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.dto.NewUserRequest;
+import ru.yandex.practicum.filmorate.storage.user.dto.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.storage.user.dto.UserDto;
 
 import java.util.Collection;
 
+@RequiredArgsConstructor
 @Service
 public class UserService {
-    private final UserStorage userStorage;
-
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
-
-    //Добавить друга
-    public User addFriend(long id, long friendId) {
-        if (userStorage.findById(id) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
-        }
-        if (userStorage.findById(friendId) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", friendId));
-        }
-
-        User user = userStorage.findById(id);
-        User friend = userStorage.findById(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
-        return user;
-    }
-
-    //Удалить друга
-    public User deleteFriend(long id, long friendId) {
-        if (userStorage.findById(id) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
-        }
-        if (userStorage.findById(friendId) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", friendId));
-        }
-
-        User user = userStorage.findById(id);
-        User friend = userStorage.findById(friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
-
-        return user;
-    }
-
-    //Получить список друзей пользователя
-    public Collection<User> getFriends(long id) {
-        if (userStorage.findById(id) == null) {
-            throw new NotFoundException("Пользователь с id = %d не найден");
-        }
-        User user = userStorage.findById(id);
-        return user.getFriends().stream()
-                .map(userStorage::findById)
-                .toList();
-    }
-
-    //Получить список общих друзей
-    public Collection<User> getCommonFriend(long id, long otherId) {
-        if (userStorage.findById(id) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
-        }
-        if (userStorage.findById(otherId) == null) {
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", otherId));
-        }
-
-        User user = userStorage.findById(id);
-        User otherUser = userStorage.findById(otherId);
-        return user.getFriends().stream()
-                .filter(otherUser.getFriends()::contains)
-                .map(userStorage::findById)
-                .toList();
-    }
+    private final UserDbStorage userStorage;
 
     //Добавить пользователя
-    public User addUser(User user) {
-        return userStorage.addUser(user);
-    }
-
-    //Обновить данные пользователя
-    public User updateUser(User user) {
-        return userStorage.updateUser(user);
-    }
-
-    //Удалить пользователя
-    public User deleteUser(long id) {
-        return userStorage.deleteUser(id);
+    public UserDto addUser(NewUserRequest request) {
+        User user = UserMapper.mapToUser(request);
+        if (user.getLogin().contains(" ")) {
+            throw new ValidationException("Login не может содержать пробелы");
+        }
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+        return UserMapper.mapToUserDto(userStorage.addUser(user));
     }
 
     //Получить всех пользователей
-    public Collection<User> findAll() {
-        return userStorage.findAll();
+    public Collection<UserDto> findAll() {
+        return userStorage.findAll().stream()
+                .map(UserMapper::mapToUserDto)
+                .toList();
     }
 
     //Получить пользователя по id
-    public User findById(long id) {
-        return userStorage.findById(id);
+    public UserDto findById(long id) {
+        return UserMapper.mapToUserDto(userStorage.findById(id));
     }
+
+    //Обновить данные пользователя
+    public UserDto updateUser(UpdateUserRequest request) {
+        User user = userStorage.findById(request.getId());
+
+        User userUpdate = UserMapper.mapToUpdate(user, request);
+        return UserMapper.mapToUserDto(userStorage.updateUser(userUpdate));
+    }
+
+    //Удалить пользователя
+    public UserDto deleteUser(long id) {
+        return UserMapper.mapToUserDto(userStorage.deleteUser(id));
+    }
+
+
+    //Добавить друга
+    public UserDto addFriend(long id, long friendId) {
+
+
+        try {
+            userStorage.findById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
+
+        try {
+            userStorage.findById(friendId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Друг с id = " + friendId + " не найден");
+        }
+
+        if (id == friendId) {
+            throw new ValidationException("Нельзя добавить самого себя в друзья");
+        }
+
+
+        if (userStorage.getFriends(id).stream()
+                .anyMatch(user -> user.equals(userStorage.findById(id)))) {
+            throw new ValidationException("Пользователь уже у вас в друзьях");
+        }
+
+        if (userStorage.getFriends(friendId).stream()
+                .anyMatch(user -> user.getId() == id)) {
+            userStorage.updateFriendshipIsConfirmed(friendId, id, true);
+            return UserMapper.mapToUserDto(userStorage.addFriend(id, friendId, true));
+        } else {
+            return UserMapper.mapToUserDto(userStorage.addFriend(id, friendId, false));
+        }
+    }
+
+    //Получить список друзей пользователя
+    public Collection<UserDto> getFriends(long id) {
+        try {
+            userStorage.findById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
+
+        return userStorage.getFriends(id).stream()
+                .map(UserMapper::mapToUserDto)
+                .toList();
+    }
+
+    //Удалить друга
+    public UserDto deleteFriend(long id, long friendId) {
+        User friend = userStorage.findById(friendId);
+
+        try {
+            userStorage.findById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
+        }
+        try {
+            userStorage.findById(friendId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException(String.format("Друг с id = %d не найден", friendId));
+        }
+
+        userStorage.deleteFriend(id, friendId);
+        userStorage.updateFriendshipIsConfirmed(friendId, id, false);
+
+        return UserMapper.mapToUserDto(friend);
+    }
+
+    //Получить список общих друзей
+    public Collection<UserDto> getCommonFriend(long id, long otherId) {
+        try {
+            userStorage.findById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
+
+        }
+        try {
+            userStorage.findById(otherId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException(String.format("Другой пользователь с id = %d не найден", otherId));
+        }
+
+        return userStorage.getCommonFriends(id, otherId).stream()
+                .map(UserMapper::mapToUserDto)
+                .toList();
+    }
+
 }
