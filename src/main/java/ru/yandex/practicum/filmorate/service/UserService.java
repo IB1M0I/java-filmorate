@@ -97,7 +97,7 @@ public class UserService {
         try {
             userStorage.findById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new ValidationException("Пользователь с id = " + id + " не найден");
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
 
         return userStorage.getFriends(id).stream()

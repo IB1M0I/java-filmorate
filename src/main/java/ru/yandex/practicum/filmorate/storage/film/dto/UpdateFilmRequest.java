@@ -36,7 +36,7 @@ public class UpdateFilmRequest {
     }
 
     public boolean hasMpaRatingId() {
-        return !(mpa.getId() == 0 || mpa == null);
+        return !(mpa == null || mpa.getId() == 0);
     }
 
     public boolean hasGenres() {

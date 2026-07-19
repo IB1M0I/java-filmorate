@@ -29,20 +29,19 @@ public class FilmService {
     public FilmDto addFilm(NewFilmRequest request) {
         Film film = FilmMapper.mapToFilm(request);
         return FilmMapper.mapToFilmDto(
-                filmStorage.getLikesAndGenresByFilmId(filmStorage.addFilm(film))
+                filmStorage.addFilm(film)
         );
     }
 
     public Collection<FilmDto> findAll() {
         return filmStorage.findAll().stream()
-                .map(filmStorage::getLikesAndGenresByFilmId)
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
 
     public FilmDto findById(long id) {
         return FilmMapper.mapToFilmDto(
-                filmStorage.getLikesAndGenresByFilmId(filmStorage.findById(id))
+                filmStorage.findById(id)
         );
     }
 
@@ -51,7 +50,7 @@ public class FilmService {
 
         Film filmUpdate = FilmMapper.mapToUpdate(film, request);
         return FilmMapper.mapToFilmDto(
-                filmStorage.getLikesAndGenresByFilmId(filmStorage.updateFilm(filmUpdate))
+                filmStorage.updateFilm(filmUpdate)
         );
     }
 
@@ -72,12 +71,12 @@ public class FilmService {
         }
 
         return FilmMapper.mapToFilmDto(
-                filmStorage.getLikesAndGenresByFilmId(filmStorage.likeFilm(id, userId))
+                filmStorage.likeFilm(id, userId)
         );
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Film deleteLike(long id, long userId) {
+    public FilmDto deleteLike(long id, long userId) {
 
         try {
             filmStorage.findById(id);
@@ -94,11 +93,11 @@ public class FilmService {
         if (result == 0) {
             throw new NotFoundException(String.format("Лайк от пользователя с id = %d для фильма с id = %d не найден", userId, id));
         }
-        return filmStorage.getLikesAndGenresByFilmId(filmStorage.findById(id));
+        return FilmMapper.mapToFilmDto(filmStorage.findById(id));
     }
 
-    public Collection<Film> getPopular(int count) {
-        return filmStorage.getLikesAndGenresByFilmId(filmStorage.getPopular(count));
+    public Collection<FilmDto> getPopular(int count) {
+        return filmStorage.getPopular(count).stream().map(FilmMapper::mapToFilmDto).toList();
     }
 
     public Collection<MpaRating> findAllMpa() {

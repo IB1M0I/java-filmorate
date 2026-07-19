@@ -8,11 +8,7 @@ public class FilmSql {
     static final String DELETE_FILM = "DELETE FROM films WHERE id = ?";
 
     static final String INSERT_GENRE_TO_FILM = "MERGE INTO movie_genres (film_id, genre_id) KEY (film_id,genre_id) VALUES (?,?)";
-    static final String GET_GENRE_BY_FILM_ID = """
-            SELECT g.id, g.name
-            FROM movie_genres AS mg
-            JOIN genres AS g ON mg.genre_id = g.id
-            WHERE mg.film_id = ?""";
+
 
     static final String LIKE_FILM = """
             MERGE INTO likes_movies (film_id, user_id)\s
@@ -26,21 +22,6 @@ public class FilmSql {
             GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
             ORDER BY COUNT(lm.film_id) DESC, f.id ASC
             LIMIT ?""";
-    static final String GET_LIKES_BY_FILM_ID = "SELECT user_id FROM likes_movies WHERE film_id = ?";
-    static final String GET_POPULAL = """
-            SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id,
-                   g.id AS genre_id, g.name AS genre_name
-            FROM (
-                SELECT films.*
-                FROM films
-                LEFT JOIN likes_movies ON films.id = likes_movies.film_id
-                GROUP BY films.id
-                ORDER BY COUNT(likes_movies.user_id) DESC
-                LIMIT ?
-            ) AS f
-            LEFT JOIN film_genres AS fg ON f.id = fg.film_id
-            LEFT JOIN genres AS g ON fg.genre_id = g.id
-            """;
 
     static final String CHECK_MPA_ID = "SELECT COUNT(*) FROM mpa_rating WHERE id = ?";
     static final String CHEK_GENRE_ID = "SELECT COUNT(*) FROM genres WHERE id = ?";

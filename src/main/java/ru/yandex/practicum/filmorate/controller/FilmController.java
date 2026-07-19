@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.film.dto.NewFilmRequest;
@@ -79,17 +78,17 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable long id, @PathVariable long userId) {
+    public FilmDto deleteLike(@PathVariable long id, @PathVariable long userId) {
         log.debug("Пользователь {} удаляет лайк с фильма с id: {}", userId, id);
-        Film film = filmService.deleteLike(id, userId);
+        FilmDto film = filmService.deleteLike(id, userId);
         log.info("Лайк успешно удален: пользователь {} с фильма {}", userId, id);
         return film;
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
+    public Collection<FilmDto> getPopular(@RequestParam(defaultValue = "10") int count) {
         log.debug("Получен запрос на получение {} популярных фильмов", count);
-        Collection<Film> films = filmService.getPopular(count);
+        Collection<FilmDto> films = filmService.getPopular(count);
         log.info("Получено {} популярных фильмов", films.size());
         return films;
     }

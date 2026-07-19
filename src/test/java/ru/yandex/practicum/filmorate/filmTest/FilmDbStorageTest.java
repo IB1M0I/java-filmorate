@@ -36,7 +36,7 @@ public class FilmDbStorageTest extends FilmSql {
                 .releaseDate(LocalDate.now())
                 .duration(120)
                 .genres(new LinkedHashSet<>(Set.of(new Genre(1))))
-                .mpa(new MpaRating(1))
+                .mpa(new MpaRating(1, "G"))
                 .build();
         Film filmSave = filmStorage.addFilm(film);
 
@@ -72,7 +72,7 @@ public class FilmDbStorageTest extends FilmSql {
         filmStorage.addFilm(film1);
         Film filmSave = filmStorage.addFilm(film2);
 
-        Film findFilm = filmStorage.getLikesAndGenresByFilmId(filmStorage.findById(filmSave.getId()));
+        Film findFilm = filmStorage.findById(filmSave.getId());
 
         Assertions.assertThat(findFilm).isNotNull();
         Assertions.assertThat(findFilm.getId()).isEqualTo(filmSave.getId());
@@ -129,7 +129,7 @@ public class FilmDbStorageTest extends FilmSql {
                 .build();
 
         filmStorage.updateFilm(updateFilm);
-        Film respone = filmStorage.getLikesAndGenresByFilmId(filmStorage.findById(film.getId()));
+        Film respone = filmStorage.findById(film.getId());
         Assertions.assertThat(respone).isNotNull();
         Assertions.assertThat(respone.getId()).isEqualTo(film.getId());
         Assertions.assertThat(respone.getName()).isEqualTo("Update Film");
