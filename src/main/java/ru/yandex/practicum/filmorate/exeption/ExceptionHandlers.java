@@ -14,6 +14,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class ExceptionHandlers {
 
+    //Обработка ошибок валидации
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidation(final ValidationException e) {
@@ -21,13 +22,17 @@ public class ExceptionHandlers {
         return Map.of("error", e.getMessage());
     }
 
+    //Обработка ошибок валидации аргументов метода
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValid(final MethodArgumentNotValidException e) {
-        log.error("Ошибка аргумента метода: {}", e.getBindingResult().getFieldError().getDefaultMessage());
-        return Map.of("error", e.getBindingResult().getFieldError().getDefaultMessage());
+        if (e.getBindingResult().getFieldError() != null) {
+            log.error("Ошибка аргумента метода: {}", e.getBindingResult().getFieldError().getDefaultMessage());
+            return Map.of("error", e.getBindingResult().getFieldError().getDefaultMessage());
+        }
     }
 
+    //Обработка ошибок когда ресурс не найден
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFound(final NotFoundException e) {
@@ -35,6 +40,7 @@ public class ExceptionHandlers {
         return Map.of("error", e.getMessage());
     }
 
+    //Обработка ошибок доступа к данным (пустой результат)
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleEmptyResultDataAccessException(final EmptyResultDataAccessException e) {
@@ -43,6 +49,7 @@ public class ExceptionHandlers {
     }
 
 
+    //Обработка внутренних ошибок сервера
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleInternalServerError(final Exception e) {

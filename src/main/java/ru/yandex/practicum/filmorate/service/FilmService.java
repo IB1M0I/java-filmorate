@@ -26,6 +26,7 @@ public class FilmService {
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
 
+    //Добавить новый фильм
     public FilmDto addFilm(NewFilmRequest request) {
         Film film = FilmMapper.mapToFilm(request);
         return FilmMapper.mapToFilmDto(
@@ -33,18 +34,21 @@ public class FilmService {
         );
     }
 
+    //Получить список всех фильмов
     public Collection<FilmDto> findAll() {
         return filmStorage.findAll().stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
 
+    //Получить фильм по id
     public FilmDto findById(long id) {
         return FilmMapper.mapToFilmDto(
                 filmStorage.findById(id)
         );
     }
 
+    //Обновить информацию о фильме
     public FilmDto updateFilm(UpdateFilmRequest request) {
         Film film = filmStorage.findById(request.getId());
 
@@ -54,10 +58,8 @@ public class FilmService {
         );
     }
 
-    public void deleteFilm(long id) {
-        filmStorage.deleteFilm(id);
-    }
 
+    //Поставить лайк фильму
     public FilmDto likeFilm(long id, long userId) {
         try {
             filmStorage.findById(id);
@@ -75,6 +77,7 @@ public class FilmService {
         );
     }
 
+    //Удалить лайк с фильма
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public FilmDto deleteLike(long id, long userId) {
 
@@ -96,22 +99,27 @@ public class FilmService {
         return FilmMapper.mapToFilmDto(filmStorage.findById(id));
     }
 
+    //Получить список популярных фильмов
     public Collection<FilmDto> getPopular(int count) {
         return filmStorage.getPopular(count).stream().map(FilmMapper::mapToFilmDto).toList();
     }
 
+    //Получить список всех рейтингов MPA
     public Collection<MpaRating> findAllMpa() {
         return filmStorage.findAllMpa();
     }
 
+    //Получить рейтинг MPA по id
     public MpaRating findByIdMpa(int id) {
         return filmStorage.findByIdMpa(id);
     }
 
+    //Получить список всех жанров
     public Collection<Genre> findAllGenres() {
         return filmStorage.findAllGenres();
     }
 
+    //Получить жанр по id
     public Genre findGenreById(long id) {
         return filmStorage.findGenreById(id);
     }

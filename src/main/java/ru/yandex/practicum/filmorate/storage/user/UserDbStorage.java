@@ -25,6 +25,7 @@ public class UserDbStorage implements UserStorage {
 
 
 
+    //Добавить пользователя в базу данных
     @Override
     public User addUser(User user) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -47,6 +48,7 @@ public class UserDbStorage implements UserStorage {
     }
 
 
+    //Обновить данные пользователя в базе данных
     @Override
     public User updateUser(User user) {
         jdbc.update(UserSql.UPDATE_USER,
@@ -54,13 +56,8 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
-    @Override
-    public User deleteUser(long id) {
-        User user = findById(id);
-        jdbc.update(DELETE_USER, id);
-        return user;
-    }
 
+    //Найти пользователя по id
     @Override
     public User findById(long id) {
         try {
@@ -70,29 +67,35 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    //Получить список всех пользователей
     @Override
     public Collection<User> findAll() {
         return jdbc.query(FIND_ALL_USERS, rowMapper);
     }
 
+    //Получить список друзей пользователя
     public Collection<User> getFriends(long id) {
         return jdbc.query(FIND_ALL_FRIENDS, rowMapper, id);
     }
 
+    //Добавить друга
     public User addFriend(long id, long friendId, boolean isConfirmed) {
         User user = findById(friendId);
         jdbc.update(ADD_FRIEND, id, friendId, isConfirmed);
         return user;
     }
 
+    //Обновить статус подтверждения дружбы
     public void updateFriendshipIsConfirmed(long id, long friendId, boolean isConfirmed) {
         jdbc.update(UPDATE_FRIENDSHIPS_IS_CONFIRMED, isConfirmed, id, friendId);
     }
 
+    //Удалить друга
     public void deleteFriend(long id, long friendId) {
         jdbc.update(DELETE_FRIEND, id, friendId);
     }
 
+    //Получить список общих друзей двух пользователей
     public Collection<User> getCommonFriends(long id, long otherId) {
         return jdbc.query(COMMON_FRIEND, rowMapper, id, otherId);
     }

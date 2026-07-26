@@ -16,12 +16,6 @@ CREATE TABLE IF NOT EXISTS mpa_rating
 
 );
 
-INSERT INTO mpa_rating (name) SELECT 'G' WHERE NOT EXISTS (SELECT 1 FROM mpa_rating WHERE name = 'G');
-INSERT INTO mpa_rating (name) SELECT 'PG' WHERE NOT EXISTS (SELECT 1 FROM mpa_rating WHERE name = 'PG');
-INSERT INTO mpa_rating (name) SELECT 'PG-13' WHERE NOT EXISTS (SELECT 1 FROM mpa_rating WHERE name = 'PG-13');
-INSERT INTO mpa_rating (name) SELECT 'R' WHERE NOT EXISTS (SELECT 1 FROM mpa_rating WHERE name = 'R');
-INSERT INTO mpa_rating (name) SELECT 'NC-17' WHERE NOT EXISTS (SELECT 1 FROM mpa_rating WHERE name = 'NC-17');
-
 --Создание таблицы фильмов
 CREATE TABLE IF NOT EXISTS films
 (

@@ -18,6 +18,7 @@ import java.util.Collection;
 public class GenreController {
     private final FilmService filmService;
 
+    //Получить список всех жанров
     @GetMapping
     public Collection<Genre> findAll() {
         log.debug("Получен запрос на получение всех жанров");
@@ -26,6 +27,7 @@ public class GenreController {
         return genres;
     }
 
+    //Получить жанр по id
     @GetMapping("/{id}")
     public Genre findById(@PathVariable long id) {
         log.debug("Получен запрос на получение жанра с id: {}", id);

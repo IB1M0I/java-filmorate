@@ -19,10 +19,12 @@ public class FilmValidationTest {
 
     @BeforeEach
     public void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try(ValidatorFactory factory = Validation.buildDefaultValidatorFactory()){
+            validator = factory.getValidator();
+        }
     }
 
+    //Тест валидации пустого названия фильма
     @Test
     public void filmNameIsEmpty() {
         Film film = new Film();
@@ -41,6 +43,7 @@ public class FilmValidationTest {
     }
 
 
+    //Тест валидации описания фильма более 200 символов
     @Test
     public void filmDescriptionExceeds200Chars() {
         Film film = new Film();
@@ -59,6 +62,7 @@ public class FilmValidationTest {
     }
 
 
+    //Тест валидации нулевой длительности фильма
     @Test
     public void filmDurationIsZero() {
         Film film = new Film();
@@ -76,6 +80,7 @@ public class FilmValidationTest {
         Assertions.assertTrue(validations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("duration")));
     }
 
+    //Тест валидации отрицательной длительности фильма
     @Test
     public void filmDurationIsNegative() {
         Film film = new Film();

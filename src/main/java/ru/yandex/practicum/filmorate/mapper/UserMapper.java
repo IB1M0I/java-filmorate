@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.user.dto.UserDto;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserMapper {
+    //Преобразовать сущность User в DTO
     public static UserDto mapToUserDto(User user) {
         UserDto userDto = new UserDto();
         userDto.setId(user.getId());
@@ -19,6 +20,7 @@ public class UserMapper {
         return userDto;
     }
 
+    //Преобразовать запрос на создание пользователя в сущность User
     public static User mapToUser(NewUserRequest request) {
         User user = new User();
         user.setEmail(request.getEmail());
@@ -28,6 +30,7 @@ public class UserMapper {
         return user;
     }
 
+    //Обновить сущность User данными из запроса на обновление
     public static User mapToUpdate(User user, UpdateUserRequest request) {
         if (request.hasName()) {
             user.setName(request.getName());

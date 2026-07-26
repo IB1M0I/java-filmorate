@@ -28,6 +28,7 @@ import java.util.Set;
 public class FilmDbStorageTest extends FilmSql {
     private final FilmDbStorage filmStorage;
 
+    //Тест создания фильма
     @Test
     public void createFilmTest() {
         Film film = Film.builder()
@@ -50,6 +51,7 @@ public class FilmDbStorageTest extends FilmSql {
         Assertions.assertThat(filmFind.getMpa()).isEqualTo(film.getMpa());
     }
 
+    //Тест поиска фильма по id
     @Test
     public void testFindFilmById() {
         Film film1 = Film.builder()
@@ -89,6 +91,7 @@ public class FilmDbStorageTest extends FilmSql {
 
     }
 
+    //Тест поиска фильма по несуществующему id
     @Test
     public void testFindUserById_NotFound() {
         Film film = Film.builder()
@@ -106,6 +109,7 @@ public class FilmDbStorageTest extends FilmSql {
                 .isInstanceOf(NotFoundException.class);
     }
 
+    //Тест обновления фильма
     @Test
     public void testUpdateFilm() {
         Film film = Film.builder()
@@ -141,6 +145,7 @@ public class FilmDbStorageTest extends FilmSql {
         Assertions.assertThat(respone.getMpa().getId()).isEqualTo(1);
     }
 
+    //Тест получения всех фильмов
     @Test
     public void testFindAllFilms() {
         Film film1 = Film.builder()
@@ -179,6 +184,7 @@ public class FilmDbStorageTest extends FilmSql {
 
     }
 
+    //Тест валидации даты выпуска фильма (до 28 декабря 1895)
     @Test
     public void filmReleaseDateBeforeFirstFilm() {
         Film film = new Film();

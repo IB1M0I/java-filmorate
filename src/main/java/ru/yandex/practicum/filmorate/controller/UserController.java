@@ -47,15 +47,6 @@ public class UserController {
     }
 
 
-    //Удалить пользователя
-    @DeleteMapping("/{id}")
-    public UserDto deleteUser(@PathVariable long id) {
-        log.debug("Получен запрос на удаление пользователя с id: {}", id);
-        UserDto user = userService.deleteUser(id);
-        log.info("Пользователь с id {} успешно удален", id);
-        return user;
-    }
-
     //Получить пользователя по id
     @GetMapping("/{id}")
     public UserDto findById(@PathVariable long id) {

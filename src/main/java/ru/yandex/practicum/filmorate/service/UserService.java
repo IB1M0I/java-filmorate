@@ -51,10 +51,6 @@ public class UserService {
         return UserMapper.mapToUserDto(userStorage.updateUser(userUpdate));
     }
 
-    //Удалить пользователя
-    public UserDto deleteUser(long id) {
-        return UserMapper.mapToUserDto(userStorage.deleteUser(id));
-    }
 
 
     //Добавить друга

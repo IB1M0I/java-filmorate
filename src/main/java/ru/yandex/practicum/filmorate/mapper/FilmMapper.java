@@ -13,6 +13,7 @@ import java.util.HashSet;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FilmMapper {
 
+    //Преобразовать сущность Film в DTO
     public static FilmDto mapToFilmDto(Film film) {
         FilmDto filmDto = new FilmDto();
         filmDto.setId(film.getId());
@@ -26,6 +27,7 @@ public class FilmMapper {
         return filmDto;
     }
 
+    //Преобразовать запрос на создание фильма в сущность Film
     public static Film mapToFilm(NewFilmRequest request) {
         Film film = new Film();
         film.setName(request.getName());
@@ -43,6 +45,7 @@ public class FilmMapper {
         return film;
     }
 
+    //Обновить сущность Film данными из запроса на обновление
     public static Film mapToUpdate(Film film, UpdateFilmRequest request) {
         if (request.hasDescription()) {
             film.setDescription(request.getDescription());

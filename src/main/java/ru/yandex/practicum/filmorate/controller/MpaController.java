@@ -18,6 +18,7 @@ import java.util.Collection;
 public class MpaController {
     private final FilmService filmService;
 
+    //Получить список всех рейтингов MPA
     @GetMapping
     public Collection<MpaRating> findAllMpa() {
         log.debug("Получен запрос на получение всех рейтингов MPA");
@@ -26,6 +27,7 @@ public class MpaController {
         return mpaRatings;
     }
 
+    //Получить рейтинг MPA по id
     @GetMapping("/{id}")
     public MpaRating findByIdMpa(@PathVariable int id) {
         log.debug("Получен запрос на получение рейтинга MPA с id: {}", id);

@@ -30,6 +30,7 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbc;
 
 
+    //Добавить фильм в базу данных
     @Override
     public Film addFilm(Film film) {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
@@ -78,6 +79,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
 
+    //Обновить информацию о фильме в базе данных
     @Override
     public Film updateFilm(Film film) {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
@@ -97,11 +99,8 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    @Override
-    public void deleteFilm(long id) {
-        jdbc.update(DELETE_FILM, id);
-    }
 
+    //Найти фильм по id
     @Override
     public Film findById(long id) {
         try {
@@ -113,21 +112,25 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    //Получить список всех фильмов
     @Override
     public Collection<Film> findAll() {
         return getLikesAndGenresByFilmId(jdbc.query(FIND_ALL_FILMS, rowMapper));
     }
 
+    //Добавить лайк фильму
     public Film likeFilm(long id, long userId) {
         Film film = findById(id);
         jdbc.update(LIKE_FILM, id, userId);
         return film;
     }
 
+    //Удалить лайк с фильма
     public int deleteLike(long id, long userId) {
         return jdbc.update(DELETE_LIKE, id, userId);
     }
 
+    //Получить список популярных фильмов
     public Collection<Film> getPopular(int count) {
         List<Film> popularFilm = jdbc.query(FIND_POPULAR, rowMapper, count);
 
@@ -135,6 +138,7 @@ public class FilmDbStorage implements FilmStorage {
         return popularFilm;
     }
 
+    //Проверить существование рейтинга MPA
     public void checkMpa(int mpaId) {
         Integer count = jdbc.queryForObject(CHECK_MPA_ID, Integer.class, mpaId);
 
@@ -143,6 +147,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    //Проверить существование жанра
     public void checkGenre(int genreId) {
         Integer count = jdbc.queryForObject(CHEK_GENRE_ID, Integer.class, genreId);
 
@@ -152,6 +157,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
 
+    //Загрузить лайки и жанры для списка фильмов
     public Collection<Film> getLikesAndGenresByFilmId(Collection<Film> films) {
         if (films == null || films.isEmpty()) {
             return films;
@@ -223,10 +229,12 @@ public class FilmDbStorage implements FilmStorage {
         return filmMap.values();
     }
 
+    //Получить список всех рейтингов MPA
     public Collection<MpaRating> findAllMpa() {
         return jdbc.query(FIND_ALL_MPA, (rs, rowMapper) -> new MpaRating(rs.getInt("id"), rs.getString("name")));
     }
 
+    //Найти рейтинг MPA по id
     public MpaRating findByIdMpa(int id) {
         try {
             return jdbc.queryForObject(FIND_BY_ID_MPA, (rs, rowMapper) -> new MpaRating(rs.getInt("id"), rs.getString("name")), id);
@@ -235,10 +243,12 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    //Получить список всех жанров
     public Collection<Genre> findAllGenres() {
         return jdbc.query(FIND_ALL_GENRE, (rs, rowMapper) -> new Genre(rs.getInt("id"), rs.getString("name")));
     }
 
+    //Найти жанр по id
     public Genre findGenreById(long id) {
         try {
             return jdbc.queryForObject(FIND_BY_ID_GENRE, (rs, rowNum) -> new Genre(rs.getInt("id"), rs.getString("name")), id);
@@ -247,6 +257,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    //Массовая вставка жанров для фильма
     public void insertGenresBatch(long filmId, Set<Genre> genres) {
         if (genres == null || genres.isEmpty()) {
             return;

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 
 @Component
 public class FilmRowMapper implements RowMapper<Film> {
+    //Преобразовать строку из ResultSet в сущность Film
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Film film = new Film();

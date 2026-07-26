@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 @Component
 public class UserRowMapper implements RowMapper<User> {
+    //Преобразовать строку из ResultSet в сущность User
     @Override
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
         User user = new User();

@@ -15,11 +15,13 @@ public class UserValidationTest {
 
     @BeforeEach
     void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try(ValidatorFactory factory = Validation.buildDefaultValidatorFactory()){
+            validator = factory.getValidator();
+        }
     }
 
 
+    //Тест валидации email без символа @
     @Test
     public void userEmailWithoutAtSign() {
         User user = new User();
@@ -42,6 +44,7 @@ public class UserValidationTest {
 
 
 
+    //Тест валидации даты рождения в будущем
     @Test
     public void userBirthdayInFuture() {
         User user = new User();

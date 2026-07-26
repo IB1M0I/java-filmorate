@@ -22,6 +22,7 @@ import java.util.Collection;
 public class UserDbStorageTest {
     private final UserDbStorage userDbStorage;
 
+    //Тест создания пользователя
     @Test
     public void createUserTest() {
         User user = User.builder()
@@ -40,6 +41,7 @@ public class UserDbStorageTest {
         Assertions.assertThat(findUser.getName()).isEqualTo("Имя");
     }
 
+    //Тест поиска пользователя по id
     @Test
     public void testFindUserById() {
         User user = User.builder()
@@ -69,6 +71,7 @@ public class UserDbStorageTest {
         Assertions.assertThat(findUser.getName()).isEqualTo(user.getName());
     }
 
+    //Тест поиска пользователя по несуществующему id
     @Test
     public void testFindUserById_NotFound() {
         User user1 = User.builder()
@@ -90,6 +93,7 @@ public class UserDbStorageTest {
         Assertions.assertThatThrownBy(() -> userDbStorage.findById(33)).isInstanceOf(NotFoundException.class);
     }
 
+    //Тест обновления пользователя
     @Test
     public void testUpdateUser() {
         User user = User.builder()
@@ -115,6 +119,7 @@ public class UserDbStorageTest {
         Assertions.assertThat(request.getName()).isEqualTo("New name");
     }
 
+    //Тест получения всех пользователей
     @Test
     public void testFindAllUsers() {
         User user1 = User.builder()
@@ -145,6 +150,7 @@ public class UserDbStorageTest {
         Assertions.assertThat(users.size()).isEqualTo(3);
     }
 
+    //Тест добавления друга
     @Test
     public void testAddFriend() {
         User user = User.builder()
@@ -168,6 +174,7 @@ public class UserDbStorageTest {
         Assertions.assertThat(userDbStorage.getFriends(saveUser.getId())).hasSize(1);
     }
 
+    //Тест удаления друга
     @Test
     public void testRemoveFriend() {
         User user = User.builder()

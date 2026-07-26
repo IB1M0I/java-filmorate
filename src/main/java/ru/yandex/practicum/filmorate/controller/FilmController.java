@@ -60,13 +60,7 @@ public class FilmController {
         return film;
     }
 
-    //Удалить фильм
-    @DeleteMapping("/{id}")
-    public void deleteFilm(@PathVariable long id) {
-        log.debug("Получен запрос на удаление фильма с id: {}", id);
-        filmService.deleteFilm(id);
-        log.info("Фильм с id {} успешно удален", id);
-    }
+
 
     //Поставить лайк фильму
     @PutMapping("/{id}/like/{userId}")
@@ -77,6 +71,7 @@ public class FilmController {
         return film;
     }
 
+    //Удалить лайк с фильма
     @DeleteMapping("/{id}/like/{userId}")
     public FilmDto deleteLike(@PathVariable long id, @PathVariable long userId) {
         log.debug("Пользователь {} удаляет лайк с фильма с id: {}", userId, id);
@@ -85,6 +80,7 @@ public class FilmController {
         return film;
     }
 
+    //Получить список популярных фильмов
     @GetMapping("/popular")
     public Collection<FilmDto> getPopular(@RequestParam(defaultValue = "10") int count) {
         log.debug("Получен запрос на получение {} популярных фильмов", count);
