@@ -30,6 +30,9 @@ public class ExceptionHandlers {
             log.error("Ошибка аргумента метода: {}", e.getBindingResult().getFieldError().getDefaultMessage());
             return Map.of("error", e.getBindingResult().getFieldError().getDefaultMessage());
         }
+
+        log.error("Ошибка аргумента метода: Validation error");
+        return Map.of("error", "Validation error");
     }
 
     //Обработка ошибок когда ресурс не найден

@@ -72,7 +72,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     //Удалить пользователя
-    @Override
     public User deleteUser(long id) {
         log.trace("Вызван метод deleteUser");
         log.debug("id = {}", id);
