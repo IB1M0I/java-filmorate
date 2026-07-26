@@ -15,7 +15,7 @@ public class UserValidationTest {
 
     @BeforeEach
     void setUp() {
-        try(ValidatorFactory factory = Validation.buildDefaultValidatorFactory()){
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             validator = factory.getValidator();
         }
     }
@@ -37,11 +37,6 @@ public class UserValidationTest {
         Assertions.assertTrue(validations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("email")));
         Assertions.assertTrue(validations.stream().anyMatch(v -> v.getMessage().equals("Введен не верный формат почты")));
     }
-
-
-
-
-
 
 
     //Тест валидации даты рождения в будущем
