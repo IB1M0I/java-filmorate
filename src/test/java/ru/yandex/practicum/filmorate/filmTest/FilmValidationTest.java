@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.filmTest;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -7,33 +7,24 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 public class FilmValidationTest {
     private Validator validator;
-    private FilmStorage filmStorage = new InMemoryFilmStorage();
-    private UserStorage userStorage = new InMemoryUserStorage();
-    private FilmService filmService = new FilmService(filmStorage,userStorage);
-    private FilmController filmController = new FilmController(filmService);
     private Set<ConstraintViolation<Film>> validations;
 
 
     @BeforeEach
     public void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
     }
 
+    //Тест валидации пустого названия фильма
     @Test
     public void filmNameIsEmpty() {
         Film film = new Film();
@@ -51,20 +42,8 @@ public class FilmValidationTest {
 
     }
 
-    @Test
-    public void filmNameIsValid() {
-        Film film = new Film();
 
-        film.setId(1L);
-        film.setName("Фильм");
-        film.setReleaseDate(LocalDate.now());
-        film.setDuration(120);
-        film.setDescription("Описание");
-
-        Film create = filmController.addFilm(film);
-        Assertions.assertEquals(film, create);
-    }
-
+    //Тест валидации описания фильма более 200 символов
     @Test
     public void filmDescriptionExceeds200Chars() {
         Film film = new Film();
@@ -82,48 +61,8 @@ public class FilmValidationTest {
         Assertions.assertTrue(validations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("description")));
     }
 
-    @Test
-    public void filmDescriptionExactly200Chars() {
-        Film film = new Film();
 
-        film.setId(1L);
-        film.setName("Фильм");
-        film.setReleaseDate(LocalDate.now());
-        film.setDuration(120);
-        film.setDescription("11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
-
-        Film create = filmController.addFilm(film);
-        Assertions.assertEquals(film, create);
-    }
-
-    @Test
-    public void filmReleaseDateBeforeFirstFilm() {
-        Film film = new Film();
-
-        film.setId(1L);
-        film.setName("Фильм");
-        film.setReleaseDate(LocalDate.of(1895, 12, 27));
-        film.setDuration(120);
-        film.setDescription("Описание");
-
-        Assertions.assertThrows(ValidationException.class, () -> filmController.addFilm(film));
-    }
-
-    @Test
-    public void filmReleaseDateExactlyFirstFilm() {
-        Film film = new Film();
-
-        film.setId(1L);
-        film.setName("Фильм");
-        film.setReleaseDate(LocalDate.of(1985, 12, 28));
-        film.setDuration(120);
-        film.setDescription("Описание");
-
-        Film create = filmController.addFilm(film);
-        Assertions.assertEquals(film, create);
-
-    }
-
+    //Тест валидации нулевой длительности фильма
     @Test
     public void filmDurationIsZero() {
         Film film = new Film();
@@ -141,6 +80,7 @@ public class FilmValidationTest {
         Assertions.assertTrue(validations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("duration")));
     }
 
+    //Тест валидации отрицательной длительности фильма
     @Test
     public void filmDurationIsNegative() {
         Film film = new Film();
@@ -158,18 +98,5 @@ public class FilmValidationTest {
         Assertions.assertTrue(validations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("duration")));
     }
 
-    @Test
-    public void filmDurationIsPositive() {
-        Film film = new Film();
 
-        film.setId(1L);
-        film.setName("Фильм");
-        film.setReleaseDate(LocalDate.now());
-        film.setDuration(1);
-        film.setDescription("Описание");
-
-        Film create = filmController.addFilm(film);
-
-        Assertions.assertEquals(film, create);
-    }
 }

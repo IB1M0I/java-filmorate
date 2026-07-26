@@ -9,7 +9,6 @@ public interface UserStorage {
 
     User updateUser(User user);
 
-    User deleteUser(long id);
 
     User findById(long id);
 

@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.exeption;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,31 +10,54 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class ExceptionHandlers {
 
+    //Обработка ошибок валидации
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidation(final ValidationException e) {
+        log.error("Ошибка валидации: {}", e.getMessage());
         return Map.of("error", e.getMessage());
     }
 
+    //Обработка ошибок валидации аргументов метода
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValid(final MethodArgumentNotValidException e) {
-        return Map.of("error", e.getMessage());
+        if (e.getBindingResult().getFieldError() != null) {
+            log.error("Ошибка аргумента метода: {}", e.getBindingResult().getFieldError().getDefaultMessage());
+            return Map.of("error", e.getBindingResult().getFieldError().getDefaultMessage());
+        }
+
+        log.error("Ошибка аргумента метода: Validation error");
+        return Map.of("error", "Validation error");
     }
 
+    //Обработка ошибок когда ресурс не найден
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFound(final NotFoundException e) {
+        log.error("Ошибка не найден: {}", e.getMessage());
         return Map.of("error", e.getMessage());
     }
 
+    //Обработка ошибок доступа к данным (пустой результат)
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleEmptyResultDataAccessException(final EmptyResultDataAccessException e) {
+        log.error("Ошибка доступа к данным: {}", e.getMessage());
+        return Map.of("error", "Ошибка валидации");
+    }
 
+
+    //Обработка внутренних ошибок сервера
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleInternalServerError(final Exception e) {
+        log.error("Внутренняя ошибка сервера: {}", e.getMessage(), e);
         return Map.of("error", e.getMessage());
     }
+
 }

@@ -70,7 +70,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     //Удалить фильм
-    @Override
     public void deleteFilm(long id) {
         log.trace("Вызван метод удаления фильма");
         log.debug("id = {}", id);
