@@ -39,9 +39,9 @@ public class ReviewMapper {
 
         return review;
     }
+
     //Обновляет review данными из запроса.
-    public static Review mapToUpdate(Review review,
-                                     UpdateReviewRequest request) {
+    public static Review mapToUpdate(Review review, UpdateReviewRequest request) {
 
         if (request.hasContent()) {
             review.setContent(request.getContent());

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 /*
     Отзывы на фильм.
     Солержит информацию о тексте отзыва, его типе (позитивный/негативный), авторе, фильме и рейтинге полезности.
