@@ -123,4 +123,11 @@ public class FilmService {
     public Genre findGenreById(long id) {
         return filmStorage.findGenreById(id);
     }
+
+    //Получить общие фильмы
+    public Collection<FilmDto> getCommonFilm(long userId, long friendId) {
+        return filmStorage.getCommonFilm(userId, friendId).stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
 }

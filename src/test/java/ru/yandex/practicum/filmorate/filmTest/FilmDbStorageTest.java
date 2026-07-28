@@ -12,21 +12,26 @@ import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmSql;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
+import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({FilmDbStorage.class, FilmRowMapper.class})
+@Import({FilmDbStorage.class, FilmRowMapper.class, UserDbStorage.class, UserRowMapper.class})
 public class FilmDbStorageTest extends FilmSql {
     private final FilmDbStorage filmStorage;
+    private final UserDbStorage userStorage;
 
     //Тест создания фильма
     @Test
@@ -196,5 +201,124 @@ public class FilmDbStorageTest extends FilmSql {
         film.setDescription("Описание");
 
         Assertions.assertThatThrownBy(() -> filmStorage.addFilm(film)).isInstanceOf(ValidationException.class);
+    }
+
+    //Тест поиска общих фильмов
+    @Test
+    public void getCommonFilms_WhenUsersHaveCommonFilms_ReturnsListOfSharedFilms() {
+        Film film1 = Film.builder()
+                .name("Фильм1")
+                .description("Описание1")
+                .releaseDate(LocalDate.now())
+                .duration(120)
+                .genres(new LinkedHashSet<>(Set.of(new Genre(1, "Комедия"))))
+                .mpa(new MpaRating(1, "G"))
+                .build();
+
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .releaseDate(LocalDate.now())
+                .duration(150)
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2, "Драмма"))))
+                .mpa(new MpaRating(2, "PG"))
+                .build();
+
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .releaseDate(LocalDate.now())
+                .duration(180)
+                .genres(new LinkedHashSet<>(Set.of(new Genre(3, "Мультфильм"))))
+                .mpa(new MpaRating(3, "PG-13"))
+                .build();
+
+        User user1 = User.builder()
+                .email("user1@example.com")
+                .login("user1")
+                .name("User One")
+                .birthday(LocalDate.of(1990, 1, 1))
+                .build();
+
+        User user2 = User.builder()
+                .email("user2@example.com")
+                .login("user2")
+                .name("User Two")
+                .birthday(LocalDate.of(1995, 5, 15))
+                .build();
+
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        userStorage.addUser(user1);
+        userStorage.addUser(user2);
+
+        filmStorage.likeFilm(film1.getId(), user1.getId());
+        filmStorage.likeFilm(film1.getId(), user2.getId());
+        filmStorage.likeFilm(film2.getId(), user1.getId());
+
+        film1.setLikes(Set.of(1L, 2L));
+        Collection<Film> expectedFilms = List.of(film1);
+
+        Collection<Film> films = filmStorage.getCommonFilm(1, 2);
+
+        Assertions.assertThat(films).isNotNull();
+        Assertions.assertThat(films).hasSize(1);
+        Assertions.assertThat(films).hasSameElementsAs(expectedFilms);
+    }
+
+    //Тест поиска общих фильмов (общих фильмов нет)
+    @Test
+    public void getCommonFilms_WhenNoCommonFilms_ReturnsEmptyList() {
+        Film film1 = Film.builder()
+                .name("Фильм1")
+                .description("Описание1")
+                .releaseDate(LocalDate.now())
+                .duration(120)
+                .genres(new LinkedHashSet<>(Set.of(new Genre(1, "Комедия"))))
+                .mpa(new MpaRating(1, "G"))
+                .build();
+
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .releaseDate(LocalDate.now())
+                .duration(150)
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2, "Драмма"))))
+                .mpa(new MpaRating(2, "PG"))
+                .build();
+
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .releaseDate(LocalDate.now())
+                .duration(180)
+                .genres(new LinkedHashSet<>(Set.of(new Genre(3, "Мультфильм"))))
+                .mpa(new MpaRating(3, "PG-13"))
+                .build();
+
+        User user1 = User.builder()
+                .email("user1@example.com")
+                .login("user1")
+                .name("User One")
+                .birthday(LocalDate.of(1990, 1, 1))
+                .build();
+
+        User user2 = User.builder()
+                .email("user2@example.com")
+                .login("user2")
+                .name("User Two")
+                .birthday(LocalDate.of(1995, 5, 15))
+                .build();
+
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        userStorage.addUser(user1);
+        userStorage.addUser(user2);
+
+        Assertions.assertThat(filmStorage.getCommonFilm(1, 2)).isEmpty();
     }
 }

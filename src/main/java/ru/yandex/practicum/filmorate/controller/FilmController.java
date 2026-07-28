@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.film.dto.NewFilmRequest;
@@ -61,7 +62,6 @@ public class FilmController {
     }
 
 
-
     //Поставить лайк фильму
     @PutMapping("/{id}/like/{userId}")
     public FilmDto likeFilm(@PathVariable long id, @PathVariable long userId) {
@@ -89,5 +89,14 @@ public class FilmController {
         return films;
     }
 
+    //Получить список общих фильмов с другом
+    @GetMapping("/common")
+    public Collection<FilmDto> getCommonFilm(@RequestParam long userId, long friendId) {
+        if (userId == friendId) {
+            throw new ValidationException("Оба пользователя указаны с одинаковым id");
+        }
+        log.debug("Пользователь {} ищет общие фильмы с пользователем {}", userId, friendId);
+        return filmService.getCommonFilm(userId, friendId);
+    }
 
 }
