@@ -49,27 +49,32 @@ public class ReviewService {
         return reviewStorage.findAll(filmId, count).stream().map(ReviewMapper::mapToDto).toList();
     }
 
-    public void addLike(long reviewId, long userId) {
+    // БЫЛО: public void addLike(long reviewId, long userId)
+    public ReviewDto addLike(long reviewId, long userId) {
         reviewStorage.findById(reviewId);
         userStorage.findById(userId);
         reviewStorage.addLike(reviewId, userId);
+        return ReviewMapper.mapToDto(reviewStorage.findById(reviewId));
     }
 
-    public void addDislike(long reviewId, long userId) {
+    public ReviewDto addDislike(long reviewId, long userId) {
         reviewStorage.findById(reviewId);
         userStorage.findById(userId);
         reviewStorage.addDislike(reviewId, userId);
+        return ReviewMapper.mapToDto(reviewStorage.findById(reviewId));
     }
 
-    public void deleteLike(long reviewId, long userId) {
+    public ReviewDto deleteLike(long reviewId, long userId) {
         reviewStorage.findById(reviewId);
         userStorage.findById(userId);
         reviewStorage.deleteLike(reviewId, userId);
+        return ReviewMapper.mapToDto(reviewStorage.findById(reviewId));
     }
 
-    public void deleteDislike(long reviewId, long userId) {
+    public ReviewDto deleteDislike(long reviewId, long userId) {
         reviewStorage.findById(reviewId);
         userStorage.findById(userId);
         reviewStorage.deleteDislike(reviewId, userId);
+        return ReviewMapper.mapToDto(reviewStorage.findById(reviewId));
     }
 }

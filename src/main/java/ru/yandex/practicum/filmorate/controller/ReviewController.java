@@ -66,34 +66,39 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addLike(@PathVariable long id, @PathVariable long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public ReviewDto addLike(@PathVariable long id, @PathVariable long userId) {
         log.debug("Пользователь {} ставит лайк отзыву {}", userId, id);
-        reviewService.addLike(id, userId);
+        ReviewDto review = reviewService.addLike(id, userId);
         log.info("Лайк успешно добавлен: пользователь {} отзыву {}", userId, id);
+        return review;
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addDislike(@PathVariable long id, @PathVariable long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public ReviewDto addDislike(@PathVariable long id, @PathVariable long userId) {
         log.debug("Пользователь {} ставит дизлайк отзыву {}", userId, id);
-        reviewService.addDislike(id, userId);
+        ReviewDto review = reviewService.addDislike(id, userId); ;
         log.info("Дизлайк успешно добавлен: пользователь {} отзыву {}", userId, id);
+        return review;
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteLike(@PathVariable long id, @PathVariable long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public ReviewDto deleteLike(@PathVariable long id, @PathVariable long userId) {
         log.debug("Пользователь {} удаляет лайк с отзыва {}", userId, id);
-        reviewService.deleteLike(id, userId);
+        ReviewDto review = reviewService.deleteLike(id, userId);
         log.info("Лайк успешно удален: пользователь {} с отзыва {}", userId, id);
+        return review;
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteDislike(@PathVariable long id, @PathVariable long userId) {
+    @ResponseStatus(HttpStatus.OK)
+    public ReviewDto deleteDislike(@PathVariable long id, @PathVariable long userId) {
         log.debug("Пользователь {} удаляет дизлайк с отзыва {}", userId, id);
-        reviewService.deleteDislike(id, userId);
+        ReviewDto review = reviewService.deleteDislike(id, userId);
         log.info("Дизлайк успешно удален: пользователь {} с отзыва {}", userId, id);
+        return review;
     }
 }
+
