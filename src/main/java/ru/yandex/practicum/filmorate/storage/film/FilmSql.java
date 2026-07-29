@@ -20,13 +20,15 @@ public class FilmSql {
             VALUES (?, ?);""";
     //SQL-запрос для удаления лайка с фильма
     static final String DELETE_LIKE = "DELETE FROM likes_movies WHERE film_id = ? AND user_id = ?";
-    //SQL-запрос для получения популярных фильмов
-    static final String FIND_POPULAR = """
-            SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
-            FROM films AS f
-            LEFT JOIN likes_movies AS lm ON f.id = lm.film_id
-            GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
-            ORDER BY COUNT(lm.film_id) DESC, f.id ASC
+    //SQL-запрос для получения count популярных фильмов по указанным жанру и году
+    static final String FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR = """
+            SELECT f.*
+            FROM films f
+            LEFT JOIN movie_genres mg ON f.id = mg.film_id
+            JOIN likes_movies lm ON f.id = lm.film_id
+            WHERE (mg.genre_id = ? OR ? IS NULL) AND (EXTRACT(YEAR FROM f.release_date) = ? OR ?  IS NULL)
+            GROUP BY f.id
+            ORDER BY count(*) DESC
             LIMIT ?""";
 
     //SQL-запрос для проверки существования рейтинга MPA
