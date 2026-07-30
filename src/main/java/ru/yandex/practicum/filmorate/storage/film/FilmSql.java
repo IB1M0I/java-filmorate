@@ -37,7 +37,7 @@ public class FilmSql {
     static final String CHEK_GENRE_ID = "SELECT COUNT(*) FROM genres WHERE id = ?";
 
     //SQL-запрос для получения всех рейтингов MPA
-    static final String FIND_ALL_MPA = "SELECT * FROM mpa_rating";
+    static final String FIND_ALL_MPA = "SELECT * FROM mpa_rating ORDER BY id";
     //SQL-запрос для поиска рейтинга MPA по id
     static final String FIND_BY_ID_MPA = "SELECT * FROM mpa_rating WHERE id = ?";
 
