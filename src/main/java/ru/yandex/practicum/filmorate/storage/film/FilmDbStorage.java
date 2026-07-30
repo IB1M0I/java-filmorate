@@ -8,8 +8,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
-import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 
 import java.sql.PreparedStatement;
@@ -122,21 +122,23 @@ public class FilmDbStorage implements FilmStorage {
         Film film = findById(id);
         int row = jdbc.update(LIKE_FILM, id, userId);
 
-        if (row != 0) {
+        if (row > 0) {
             addEvent(Instant.now().getEpochSecond(), userId, EventType.LIKE, Operation.ADD, id);
             return film;
+        }else{
+            throw new RuntimeException("Не удалось добавить лайк");
         }
-        throw new RuntimeException("Не удалось добавить лайк"); //TODO добавить исключения "Не найдено в БД"
     }
 
     //Удалить лайк с фильма
     public int deleteLike(long id, long userId) {
         int row = jdbc.update(DELETE_LIKE, id, userId);
-        if(row != 0){
+        if(row > 0){
             addEvent(Instant.now().getEpochSecond(), userId, EventType.LIKE, Operation.REMOVE, id);
             return row;
+        }else{
+            throw new RuntimeException("Ну удалось удалить лайк");
         }
-        throw new RuntimeException("Ну удалось удалить лайк"); //TODO добавить исключения "Не найдено в БД"
     }
 
     //Получить список популярных фильмов

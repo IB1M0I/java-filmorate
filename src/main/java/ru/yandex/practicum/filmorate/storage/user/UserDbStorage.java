@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Operation;
@@ -64,11 +64,7 @@ public class UserDbStorage implements UserStorage {
     //Найти пользователя по id
     @Override
     public User findById(long id) {
-        try {
             return jdbc.queryForObject(FIND_USER_BY_ID, rowMapper, id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Пользователь с id " + id + " не найден");
-        }
     }
 
     //Получить список всех пользователей
@@ -87,12 +83,12 @@ public class UserDbStorage implements UserStorage {
         User user = findById(friendId);
         int row = jdbc.update(ADD_FRIEND, id, friendId, isConfirmed);
 
-        if(row != 0){
+        if(row > 0){
             addEvent(Instant.now().getEpochSecond(), id, EventType.FRIEND, Operation.ADD, friendId);
             return user;
+        }else {
+            throw new RuntimeException("Не удалось добавить друга");
         }
-
-        throw new RuntimeException("Не удалось добавить друга"); //TODO добавить исключения "Не найдено в БД"
 
     }
 
@@ -105,10 +101,9 @@ public class UserDbStorage implements UserStorage {
     public void deleteFriend(long id, long friendId) {
         int row = jdbc.update(DELETE_FRIEND, id, friendId);
 
-        if(row != 0){
+        if(row > 0){
             addEvent(Instant.now().getEpochSecond(), id, EventType.FRIEND, Operation.REMOVE, friendId);
         }
-        throw new RuntimeException("Не удалось удалить друга"); //TODO добавить исключения "Не найдено в БД"
     }
 
 

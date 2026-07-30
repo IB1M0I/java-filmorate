@@ -64,6 +64,7 @@ public class UserController {
         UserDto user = userService.addFriend(id, friendId);
         log.info("Пользователь {} успешно добавлен в друзья пользователю {}", friendId, id);
         return user;
+
     }
 
     //Получить список друзей пользователя
