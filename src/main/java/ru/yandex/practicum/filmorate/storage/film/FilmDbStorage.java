@@ -10,13 +10,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -121,13 +120,23 @@ public class FilmDbStorage implements FilmStorage {
     //Добавить лайк фильму
     public Film likeFilm(long id, long userId) {
         Film film = findById(id);
-        jdbc.update(LIKE_FILM, id, userId);
-        return film;
+        int row = jdbc.update(LIKE_FILM, id, userId);
+
+        if (row != 0) {
+            addEvent(Instant.now().getEpochSecond(), userId, EventType.LIKE, Operation.ADD, id);
+            return film;
+        }
+        throw new RuntimeException("Не удалось добавить лайк"); //TODO добавить исключения "Не найдено в БД"
     }
 
     //Удалить лайк с фильма
     public int deleteLike(long id, long userId) {
-        return jdbc.update(DELETE_LIKE, id, userId);
+        int row = jdbc.update(DELETE_LIKE, id, userId);
+        if(row != 0){
+            addEvent(Instant.now().getEpochSecond(), userId, EventType.LIKE, Operation.REMOVE, id);
+            return row;
+        }
+        throw new RuntimeException("Ну удалось удалить лайк"); //TODO добавить исключения "Не найдено в БД"
     }
 
     //Получить список популярных фильмов
@@ -278,5 +287,9 @@ public class FilmDbStorage implements FilmStorage {
             }
         });
 
+    }
+
+    public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
+        jdbc.update(INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
     }
 }

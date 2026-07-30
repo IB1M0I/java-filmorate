@@ -54,4 +54,10 @@ public class FilmSql {
 
     //SQL-запрос для поиска жанра по id
     static final String FIND_BY_ID_GENRE = "SELECT * FROM genres WHERE id = ?";
+
+    //SQL-запрос для добавления события пользователя
+    static final String INSERT_USER_EVENT = """
+            INSERT INTO EVENTS (timestamp, user_id, event_type, operation, entity_id)
+            VALUES (?, ?, ?, ?, ?)
+            """;
 }

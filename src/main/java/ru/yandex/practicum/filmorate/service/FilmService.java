@@ -72,6 +72,7 @@ public class FilmService {
             throw new NotFoundException(String.format("Пользователь с id = %d не найден, поставить лайк не получилось", userId));
         }
 
+
         return FilmMapper.mapToFilmDto(
                 filmStorage.likeFilm(id, userId)
         );

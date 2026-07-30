@@ -48,4 +48,10 @@ public class UserSql {
             FROM events
             WHERE user_id = ?;
             """;
+
+    //SQL-запрос для добавления события пользователя
+    static final String INSERT_USER_EVENT = """
+            INSERT INTO EVENTS (timestamp, user_id, event_type, operation, entity_id)
+            VALUES (?, ?, ?, ?, ?)
+            """;
 }

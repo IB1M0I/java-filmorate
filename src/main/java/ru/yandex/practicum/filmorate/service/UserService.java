@@ -57,7 +57,6 @@ public class UserService {
     //Добавить друга
     public UserDto addFriend(long id, long friendId) {
 
-
         try {
             userStorage.findById(id);
         } catch (EmptyResultDataAccessException e) {

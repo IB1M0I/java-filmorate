@@ -9,11 +9,14 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.mapper.EventRowMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.time.Instant;
 import java.util.Collection;
 
 import static ru.yandex.practicum.filmorate.storage.user.UserSql.*;
@@ -24,7 +27,6 @@ import static ru.yandex.practicum.filmorate.storage.user.UserSql.*;
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbc;
     private final RowMapper<User> rowMapper;
-
 
 
     //Добавить пользователя в базу данных
@@ -83,8 +85,15 @@ public class UserDbStorage implements UserStorage {
     //Добавить друга
     public User addFriend(long id, long friendId, boolean isConfirmed) {
         User user = findById(friendId);
-        jdbc.update(ADD_FRIEND, id, friendId, isConfirmed);
-        return user;
+        int row = jdbc.update(ADD_FRIEND, id, friendId, isConfirmed);
+
+        if(row != 0){
+            addEvent(Instant.now().getEpochSecond(), id, EventType.FRIEND, Operation.ADD, friendId);
+            return user;
+        }
+
+        throw new RuntimeException("Не удалось добавить друга"); //TODO добавить исключения "Не найдено в БД"
+
     }
 
     //Обновить статус подтверждения дружбы
@@ -94,8 +103,14 @@ public class UserDbStorage implements UserStorage {
 
     //Удалить друга
     public void deleteFriend(long id, long friendId) {
-        jdbc.update(DELETE_FRIEND, id, friendId);
+        int row = jdbc.update(DELETE_FRIEND, id, friendId);
+
+        if(row != 0){
+            addEvent(Instant.now().getEpochSecond(), id, EventType.FRIEND, Operation.REMOVE, friendId);
+        }
+        throw new RuntimeException("Не удалось удалить друга"); //TODO добавить исключения "Не найдено в БД"
     }
+
 
     //Получить список общих друзей двух пользователей
     public Collection<User> getCommonFriends(long id, long otherId) {
@@ -103,6 +118,10 @@ public class UserDbStorage implements UserStorage {
     }
 
     public Collection<Event> getEventsUser(long id) {
-        return jdbc.query(FIND_USER_EVENT_ID,new EventRowMapper(), id);
+        return jdbc.query(FIND_USER_EVENT_ID, new EventRowMapper(), id);
+    }
+
+    public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
+        jdbc.update(INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
     }
 }
