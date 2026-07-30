@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.storage.review.dto.NewReviewRequest;
 import ru.yandex.practicum.filmorate.storage.review.dto.UpdateReviewRequest;
@@ -25,11 +26,29 @@ class ReviewControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     private NewReviewRequest newReviewRequest;
+
     private UpdateReviewRequest updateReviewRequest;
 
     @BeforeEach
     void setUp() {
+        jdbcTemplate.update("DELETE FROM review_likes");
+        jdbcTemplate.update("DELETE FROM reviews");
+        jdbcTemplate.update("DELETE FROM likes_movies");
+        jdbcTemplate.update("DELETE FROM friendships");
+        jdbcTemplate.update("DELETE FROM movie_genres");
+        jdbcTemplate.update("DELETE FROM films");
+        jdbcTemplate.update("DELETE FROM users");
+        jdbcTemplate.update("ALTER TABLE users ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE films ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)",
+                "test@test.com", "testuser", "Test", "2000-01-01");
+        jdbcTemplate.update("INSERT INTO films (name, description, release_date, duration, mpa_rating_id) VALUES (?, ?, ?, ?, ?)",
+                "Film", "Desc", "2020-01-01", 120, 1);
+
         newReviewRequest = new NewReviewRequest();
         newReviewRequest.setContent("Отличный фильм!");
         newReviewRequest.setIsPositive(true);
