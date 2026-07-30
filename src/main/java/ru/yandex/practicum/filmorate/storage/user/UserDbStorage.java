@@ -112,10 +112,12 @@ public class UserDbStorage implements UserStorage {
         return jdbc.query(COMMON_FRIEND, rowMapper, id, otherId);
     }
 
+    //Получить события пользователя
     public Collection<Event> getEventsUser(long id) {
         return jdbc.query(FIND_USER_EVENT_ID, new EventRowMapper(), id);
     }
 
+    //Добавить событие
     public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
         jdbc.update(INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
     }

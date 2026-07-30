@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 @Component
 public class EventRowMapper implements RowMapper<Event> {
+    //Преобразовать строку из ResultSet в сущность Event
     @Override
     public Event mapRow(ResultSet rs, int rowNum) throws SQLException {
         Event event = new Event();

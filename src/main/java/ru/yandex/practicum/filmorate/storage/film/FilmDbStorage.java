@@ -291,6 +291,7 @@ public class FilmDbStorage implements FilmStorage {
 
     }
 
+    //Добавить событие
     public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
         jdbc.update(INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
     }
