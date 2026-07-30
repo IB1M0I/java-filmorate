@@ -48,7 +48,7 @@ public class FilmSql {
     static final String FIND_BY_COMMON_FILM = """
             SELECT f.*
             FROM likes_movies lm1
-            JOIN likes_movies AS lm2 ON lm1.FILM_ID = lm2.FILM_ID
+            JOIN likes_movies AS lm2 ON lm1.film_id = lm2.film_id
             JOIN films AS f ON f.id = lm1.film_id
             WHERE lm1.user_id = ? AND lm2.user_id = ?
             GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
