@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
+import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+
 import java.util.Arrays;
 
 public enum Operation {
@@ -11,7 +13,7 @@ public enum Operation {
         return Arrays.stream(Operation.values())
                 .filter(e -> e.name().equals(text))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("Operation не найден"));
     }
 
 }

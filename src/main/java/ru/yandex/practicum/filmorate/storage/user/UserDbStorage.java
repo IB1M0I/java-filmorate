@@ -8,7 +8,9 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.mapper.EventRowMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -98,5 +100,9 @@ public class UserDbStorage implements UserStorage {
     //Получить список общих друзей двух пользователей
     public Collection<User> getCommonFriends(long id, long otherId) {
         return jdbc.query(COMMON_FRIEND, rowMapper, id, otherId);
+    }
+
+    public Collection<Event> getEventsUser(long id) {
+        return jdbc.query(FIND_USER_EVENT_ID,new EventRowMapper(), id);
     }
 }
