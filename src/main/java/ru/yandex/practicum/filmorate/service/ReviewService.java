@@ -49,7 +49,6 @@ public class ReviewService {
         return reviewStorage.findAll(filmId, count).stream().map(ReviewMapper::mapToDto).toList();
     }
 
-    // БЫЛО: public void addLike(long reviewId, long userId)
     public ReviewDto addLike(long reviewId, long userId) {
         reviewStorage.findById(reviewId);
         userStorage.findById(userId);
