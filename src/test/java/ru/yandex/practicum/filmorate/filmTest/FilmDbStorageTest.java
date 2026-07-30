@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.film.FilmSql;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
 
 import java.time.LocalDate;
@@ -25,7 +24,7 @@ import java.util.Set;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({FilmDbStorage.class, FilmRowMapper.class})
-public class FilmDbStorageTest extends FilmSql {
+public class FilmDbStorageTest {
     private final FilmDbStorage filmStorage;
 
     //Тест создания фильма
