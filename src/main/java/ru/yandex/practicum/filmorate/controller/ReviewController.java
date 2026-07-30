@@ -78,7 +78,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.OK)
     public ReviewDto addDislike(@PathVariable long id, @PathVariable long userId) {
         log.debug("Пользователь {} ставит дизлайк отзыву {}", userId, id);
-        ReviewDto review = reviewService.addDislike(id, userId); ;
+        ReviewDto review = reviewService.addDislike(id, userId);
         log.info("Дизлайк успешно добавлен: пользователь {} отзыву {}", userId, id);
         return review;
     }
