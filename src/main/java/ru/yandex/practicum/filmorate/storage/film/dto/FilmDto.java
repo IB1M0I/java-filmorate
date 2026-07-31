@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film.dto;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Director;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -17,4 +18,5 @@ public class FilmDto {
     private MpaRating mpa;
     private Set<Genre> genres;
     private Set<Long> likes;
+    private Set<Director> directors;
 }
