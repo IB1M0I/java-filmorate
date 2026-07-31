@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,6 @@ public class ReviewController {
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.OK)
     public ReviewDto updateReview(@Valid @RequestBody UpdateReviewRequest request) {
         log.debug("Получен запрос на обновление отзыва с id: {}", request.getReviewId());
         ReviewDto review = reviewService.updateReview(request);
@@ -46,7 +46,6 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ReviewDto findById(@PathVariable long id) {
         log.debug("Получен запрос на получение отзыва с id: {}", id);
         ReviewDto review = reviewService.findById(id);
@@ -55,10 +54,9 @@ public class ReviewController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public Collection<ReviewDto> findAll(
             @RequestParam(required = false) Long filmId,
-            @RequestParam(defaultValue = "10") int count) {
+            @RequestParam(defaultValue = "10") @Positive(message = "Количество должно быть положительным числом") int count) {
         log.debug("Получен запрос на получение отзывов для фильма: {}", filmId);
         Collection<ReviewDto> reviews = reviewService.findAll(filmId, count);
         log.info("Получено {} отзывов", reviews.size());
@@ -66,8 +64,9 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ReviewDto addLike(@PathVariable long id, @PathVariable long userId) {
+    public ReviewDto addLike(
+            @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
+            @PathVariable @Positive(message = "ID пользователя должен быть положительным числом") long userId) {
         log.debug("Пользователь {} ставит лайк отзыву {}", userId, id);
         ReviewDto review = reviewService.addLike(id, userId);
         log.info("Лайк успешно добавлен: пользователь {} отзыву {}", userId, id);
@@ -75,8 +74,9 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ReviewDto addDislike(@PathVariable long id, @PathVariable long userId) {
+    public ReviewDto addDislike(
+            @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
+            @PathVariable @Positive(message = "ID пользователя должен быть положительным числом") long userId) {
         log.debug("Пользователь {} ставит дизлайк отзыву {}", userId, id);
         ReviewDto review = reviewService.addDislike(id, userId);
         log.info("Дизлайк успешно добавлен: пользователь {} отзыву {}", userId, id);
@@ -84,8 +84,9 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ReviewDto deleteLike(@PathVariable long id, @PathVariable long userId) {
+    public ReviewDto deleteLike(
+            @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
+            @PathVariable @Positive(message = "ID пользователя должен быть положительным числом") long userId) {
         log.debug("Пользователь {} удаляет лайк с отзыва {}", userId, id);
         ReviewDto review = reviewService.deleteLike(id, userId);
         log.info("Лайк успешно удален: пользователь {} с отзыва {}", userId, id);
@@ -93,8 +94,9 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ReviewDto deleteDislike(@PathVariable long id, @PathVariable long userId) {
+    public ReviewDto deleteDislike(
+            @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
+            @PathVariable @Positive(message = "ID пользователя должен быть положительным числом") long userId) {
         log.debug("Пользователь {} удаляет дизлайк с отзыва {}", userId, id);
         ReviewDto review = reviewService.deleteDislike(id, userId);
         log.info("Дизлайк успешно удален: пользователь {} с отзыва {}", userId, id);
