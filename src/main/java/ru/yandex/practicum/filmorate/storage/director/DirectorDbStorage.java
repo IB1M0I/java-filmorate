@@ -13,7 +13,11 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
 
-import static ru.yandex.practicum.filmorate.storage.director.DirectorSql.*;
+import static ru.yandex.practicum.filmorate.storage.director.DirectorSql.INSERT_DIRECTOR;
+import static ru.yandex.practicum.filmorate.storage.director.DirectorSql.UPDATE_DIRECTOR;
+import static ru.yandex.practicum.filmorate.storage.director.DirectorSql.FIND_ALL_DIRECTORS;
+import static ru.yandex.practicum.filmorate.storage.director.DirectorSql.FIND_DIRECTOR_BY_ID;
+import static ru.yandex.practicum.filmorate.storage.director.DirectorSql.DELETE_DIRECTOR;
 
 @Repository
 @RequiredArgsConstructor

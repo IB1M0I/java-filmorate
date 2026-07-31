@@ -14,7 +14,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.*;
+import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.INSERT_FILM_DIRECTOR;
+import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_DIRECTORS_BY_FILM_IDS;
+import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_FILMS_BY_DIRECTOR_SORT_BY_YEAR;
+import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_FILMS_BY_DIRECTOR_SORT_BY_LIKES;
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.sql.PreparedStatement;
