@@ -1,10 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.user.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.storage.user.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.storage.user.dto.UserDto;
@@ -15,6 +19,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -90,6 +95,12 @@ public class UserController {
         Collection<UserDto> commonFriends = userService.getCommonFriend(id, otherId);
         log.info("Получено {} общих друзей пользователей {} и {}", commonFriends.size(), id, otherId);
         return commonFriends;
+    }
+
+    // Получить рекомендации по фильмам
+    @GetMapping("/{id}/recommendations")
+    public Collection<FilmDto> getRecommendations(@PathVariable @NotNull @Positive Long id){
+        return userService.getRecommendations(id);
     }
 
 }

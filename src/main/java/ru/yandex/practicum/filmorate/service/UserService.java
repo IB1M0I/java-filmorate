@@ -5,8 +5,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.storage.user.dto.UpdateUserRequest;
@@ -50,7 +52,6 @@ public class UserService {
         User userUpdate = UserMapper.mapToUpdate(user, request);
         return UserMapper.mapToUserDto(userStorage.updateUser(userUpdate));
     }
-
 
 
     //Добавить друга
@@ -141,4 +142,13 @@ public class UserService {
                 .toList();
     }
 
+    public Collection<FilmDto> getRecommendations(long id) {
+        // проверка существования пользователя
+        userStorage.findById(id);
+
+        return userStorage.getRecommendations(id)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
 }
