@@ -72,8 +72,8 @@ public class FilmDbStorage implements FilmStorage {
             } else {
                 film.setGenres(new LinkedHashSet<>());
             }
-            if (film.getDirector() != null && !film.getDirector().isEmpty()) {
-                for (Director director : film.getDirector()) {
+            if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+                for (Director director : film.getDirectors()) {
                     Integer count = jdbc.queryForObject(
                             "SELECT COUNT(*) FROM directors WHERE id = ?",
                             Integer.class,
@@ -83,7 +83,7 @@ public class FilmDbStorage implements FilmStorage {
                         throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
                     }
                 }
-                insertDirectorsBatch(film.getId(), film.getDirector());
+                insertDirectorsBatch(film.getId(), film.getDirectors());
             }
         } else {
             throw new RuntimeException("Не удалось сохранить фильм и получить id");
@@ -111,8 +111,8 @@ public class FilmDbStorage implements FilmStorage {
 
         insertGenresBatch(film.getId(), film.getGenres());
 
-        if (film.getDirector() != null && !film.getDirector().isEmpty()) {
-            for (Director director : film.getDirector()) {
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            for (Director director : film.getDirectors()) {
                 Integer count = jdbc.queryForObject(
                         "SELECT COUNT(*) FROM directors WHERE id = ?",
                         Integer.class,
@@ -122,7 +122,7 @@ public class FilmDbStorage implements FilmStorage {
                     throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
                 }
             }
-            insertDirectorsBatch(film.getId(), film.getDirector());
+            insertDirectorsBatch(film.getId(), film.getDirectors());
         }
 
         return film;
@@ -288,7 +288,7 @@ public class FilmDbStorage implements FilmStorage {
                         rs.getLong("director_id"),
                         rs.getString("director_name")
                 );
-                film.getDirector().add(director);
+                film.getDirectors().add(director);
             }
         }, filmIds);
 

@@ -21,7 +21,7 @@ public class UpdateFilmRequest {
     private Integer duration;
     private MpaRating mpa;
     private LinkedHashSet<Genre> genres;
-    private Set<Director> director = new HashSet<>();
+    private Set<Director> directors = new HashSet<>();
 
     public boolean hasName() {
         return name != null || !name.isBlank();
@@ -48,6 +48,6 @@ public class UpdateFilmRequest {
     }
 
     public boolean hasDirectors() {
-        return director != null && !director.isEmpty();
+        return directors != null && !directors.isEmpty();
     }
 }

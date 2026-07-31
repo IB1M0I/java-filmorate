@@ -27,5 +27,5 @@ public class NewFilmRequest {
     private LinkedHashSet<Genre> genres;
     private Set<Long> likes;
     private MpaRating mpa;
-    private Set<Director> director = new HashSet<>();
+    private Set<Director> directors = new HashSet<>();
 }
