@@ -19,7 +19,7 @@ public class ReviewMapper {
 
         dto.setReviewId(review.getReviewId());
         dto.setContent(review.getContent());
-        dto.setIsPositive(review.getIsPositive());
+        dto.setIsPositive(review.isPositive());
         dto.setUserId(review.getUserId());
         dto.setFilmId(review.getFilmId());
         dto.setUseful(review.getUseful());
@@ -32,7 +32,7 @@ public class ReviewMapper {
         Review review = new Review();
 
         review.setContent(request.getContent());
-        review.setIsPositive(request.getIsPositive());
+        review.setPositive(request.getIsPositive());
         review.setUserId(request.getUserId());
         review.setFilmId(request.getFilmId());
         review.setUseful(0);
@@ -48,7 +48,7 @@ public class ReviewMapper {
         }
 
         if (request.hasIsPositive()) {
-            review.setIsPositive(request.getIsPositive());
+            review.setPositive(request.getIsPositive());
         }
 
         return review;

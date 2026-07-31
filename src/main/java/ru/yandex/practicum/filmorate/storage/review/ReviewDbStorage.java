@@ -47,7 +47,7 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbc.update(con -> {
             PreparedStatement ps = con.prepareStatement(INSERT_REVIEW, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, review.getContent());
-            ps.setBoolean(2, review.getIsPositive());
+            ps.setBoolean(2, review.isPositive());
             ps.setLong(3, review.getUserId());
             ps.setLong(4, review.getFilmId());
             ps.setInt(5, review.getUseful());
@@ -65,7 +65,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review updateReview(Review review) {
-        jdbc.update(UPDATE_REVIEW, review.getContent(), review.getIsPositive(), review.getReviewId());
+        jdbc.update(UPDATE_REVIEW, review.getContent(), review.isPositive(), review.getReviewId());
         return findById(review.getReviewId());
     }
 
