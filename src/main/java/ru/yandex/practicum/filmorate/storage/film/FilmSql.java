@@ -43,4 +43,31 @@ public class FilmSql {
     static final String FIND_ALL_GENRE = "SELECT * FROM genres";
     //SQL-запрос для поиска жанра по id
     static final String FIND_BY_ID_GENRE = "SELECT * FROM genres WHERE id = ?";
+
+    //Новые SQL-запросы для работы с режиссерами
+    static final String INSERT_FILM_DIRECTOR =
+            "INSERT INTO film_directors (film_id, director_id) VALUES (?, ?)";
+
+    static final String DELETE_FILM_DIRECTORS =
+            "DELETE FROM film_directors WHERE film_id = ?";
+
+    static final String FIND_DIRECTORS_BY_FILM_IDS =
+            "SELECT fd.film_id, d.id AS director_id, d.name AS director_name " +
+                    "FROM film_directors fd " +
+                    "JOIN directors d ON fd.director_id = d.id " +
+                    "WHERE fd.film_id IN (";
+
+    static final String FIND_FILMS_BY_DIRECTOR_SORT_BY_YEAR =
+            "SELECT f.* FROM films f " +
+                    "JOIN film_directors fd ON f.id = fd.film_id " +
+                    "WHERE fd.director_id = ? " +
+                    "ORDER BY f.release_date ASC";
+
+    static final String FIND_FILMS_BY_DIRECTOR_SORT_BY_LIKES =
+            "SELECT f.*, COUNT(lm.user_id) as like_count FROM films f " +
+                    "JOIN film_directors fd ON f.id = fd.film_id " +
+                    "LEFT JOIN likes_movies lm ON f.id = lm.film_id " +
+                    "WHERE fd.director_id = ? " +
+                    "GROUP BY f.id " +
+                    "ORDER BY like_count DESC";
 }

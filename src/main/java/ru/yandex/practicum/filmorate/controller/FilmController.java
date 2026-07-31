@@ -89,5 +89,16 @@ public class FilmController {
         return films;
     }
 
+    //Получить фильмы режиссера с сортировкой
+    @GetMapping("/director/{directorId}")
+    public Collection<FilmDto> getFilmsByDirector(
+            @PathVariable long directorId,
+            @RequestParam String sortBy) {
+        log.debug("Получен запрос на получение фильмов режиссера с id: {}, сортировка: {}",
+                directorId, sortBy);
+        Collection<FilmDto> films = filmService.getFilmsByDirector(directorId, sortBy);
+        log.info("Получено {} фильмов режиссёра с id: {}", films.size(), directorId);
+        return films;
+    }
 
 }
