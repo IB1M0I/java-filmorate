@@ -47,6 +47,5 @@ public class UpdateFilmRequest {
         return genres != null && !genres.isEmpty();
     }
 
-    public boolean hasDirectors() { return directors != null && !directors.isEmpty();
-    }
+    public boolean hasDirectors() { return directors != null && !directors.isEmpty(); }
 }
