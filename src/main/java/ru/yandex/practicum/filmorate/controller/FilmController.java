@@ -97,7 +97,7 @@ public class FilmController {
         log.debug("Получен запрос на получение фильмов режиссера с id: {}, сортировка: {}",
                 directorId, sortBy);
         Collection<FilmDto> films = filmService.getFilmsByDirector(directorId, sortBy);
-        log.info("Получено {} фильмов режиссёра с id: {}", films.size(), directorId);
+        log.info("Получено {} фильмов режиссера с id: {}", films.size(), directorId);
         return films;
     }
 

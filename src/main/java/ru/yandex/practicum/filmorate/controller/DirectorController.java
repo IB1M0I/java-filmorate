@@ -38,7 +38,7 @@ public class DirectorController {
     public Director findById(@PathVariable long id) {
         log.debug("Получен запрос на получение режиссера с id: {}", id);
         Director director = directorService.findById(id);
-        log.info("Режиссёр с id {} успешно получен", id);
+        log.info("Режиссер с id {} успешно получен", id);
         return director;
     }
 
