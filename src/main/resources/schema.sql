@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS likes_movies
     PRIMARY KEY (film_id, user_id),
     CONSTRAINT fk_likes_movies_films FOREIGN KEY (film_id) REFERENCES films (id) ON DELETE CASCADE,
     CONSTRAINT fk_likes_movies_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-)
+);
 
 --Создание таблицы режиссеров
 CREATE TABLE IF NOT EXISTS directors
