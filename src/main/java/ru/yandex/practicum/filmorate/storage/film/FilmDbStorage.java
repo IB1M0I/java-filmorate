@@ -72,8 +72,8 @@ public class FilmDbStorage implements FilmStorage {
             } else {
                 film.setGenres(new LinkedHashSet<>());
             }
-            if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-                insertDirectorsBatch(film.getId(), film.getDirectors());
+            if (film.getDirector() != null && !film.getDirector().isEmpty()) {
+                insertDirectorsBatch(film.getId(), film.getDirector());
             }
         } else {
             throw new RuntimeException("Не удалось сохранить фильм и получить id");
@@ -101,8 +101,8 @@ public class FilmDbStorage implements FilmStorage {
 
         insertGenresBatch(film.getId(), film.getGenres());
 
-        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            insertDirectorsBatch(film.getId(), film.getDirectors());
+        if (film.getDirector() != null && !film.getDirector().isEmpty()) {
+            insertDirectorsBatch(film.getId(), film.getDirector());
         }
 
         return film;
@@ -268,7 +268,7 @@ public class FilmDbStorage implements FilmStorage {
                         rs.getLong("director_id"),
                         rs.getString("director_name")
                 );
-                film.getDirectors().add(director);
+                film.getDirector().add(director);
             }
         }, filmIds);
 
@@ -331,18 +331,18 @@ public class FilmDbStorage implements FilmStorage {
             return;
         }
 
-        List<Director> listDirectors = new ArrayList<>(directors);
+        List<Director> listDirector = new ArrayList<>(directors);
 
         jdbc.batchUpdate(INSERT_FILM_DIRECTOR, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 ps.setLong(1, filmId);
-                ps.setLong(2, listDirectors.get(i).getId());
+                ps.setLong(2, listDirector.get(i).getId());
             }
 
             @Override
             public int getBatchSize() {
-                return listDirectors.size();
+                return listDirector.size();
             }
         });
     }
