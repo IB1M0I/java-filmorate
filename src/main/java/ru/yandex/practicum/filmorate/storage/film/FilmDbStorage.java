@@ -73,6 +73,16 @@ public class FilmDbStorage implements FilmStorage {
                 film.setGenres(new LinkedHashSet<>());
             }
             if (film.getDirector() != null && !film.getDirector().isEmpty()) {
+                for (Director director : film.getDirector()) {
+                    Integer count = jdbc.queryForObject(
+                            "SELECT COUNT(*) FROM directors WHERE id = ?",
+                            Integer.class,
+                            director.getId()
+                    );
+                    if (count == null || count == 0) {
+                        throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
+                    }
+                }
                 insertDirectorsBatch(film.getId(), film.getDirector());
             }
         } else {
@@ -102,6 +112,16 @@ public class FilmDbStorage implements FilmStorage {
         insertGenresBatch(film.getId(), film.getGenres());
 
         if (film.getDirector() != null && !film.getDirector().isEmpty()) {
+            for (Director director : film.getDirector()) {
+                Integer count = jdbc.queryForObject(
+                        "SELECT COUNT(*) FROM directors WHERE id = ?",
+                        Integer.class,
+                        director.getId()
+                );
+                if (count == null || count == 0) {
+                    throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
+                }
+            }
             insertDirectorsBatch(film.getId(), film.getDirector());
         }
 
