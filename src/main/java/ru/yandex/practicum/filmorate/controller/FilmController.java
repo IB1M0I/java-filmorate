@@ -1,9 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -17,6 +20,7 @@ import java.util.Collection;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/films")
+@Validated
 public class FilmController {
     private final FilmService filmService;
 
@@ -82,10 +86,16 @@ public class FilmController {
 
     //Получить список популярных фильмов
     @GetMapping("/popular")
-    public Collection<FilmDto> getPopular(@RequestParam(defaultValue = "10") int count) {
-        log.debug("Получен запрос на получение {} популярных фильмов", count);
-        Collection<FilmDto> films = filmService.getPopular(count);
-        log.info("Получено {} популярных фильмов", films.size());
+    public Collection<FilmDto> getPopular(
+            @RequestParam(defaultValue = "10") @NotNull @Positive Integer count,
+            @RequestParam(required = false) @Positive Integer genreId,
+            @RequestParam(required = false) @Positive Integer year) {
+        String logMsg = "популярных фильмов" +
+                (genreId != null ? " жанра с id=" + genreId : "") +
+                (year != null ? " " + year + " года" : "");
+        log.debug("Получен запрос на получение {} {}", count, logMsg);
+        Collection<FilmDto> films = filmService.getPopularFilmsByGenreIdByYear(count, genreId, year);
+        log.info("Получено {} {}", films.size(), logMsg);
         return films;
     }
 

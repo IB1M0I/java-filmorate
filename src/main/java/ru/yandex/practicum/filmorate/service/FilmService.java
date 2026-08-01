@@ -99,9 +99,13 @@ public class FilmService {
         return FilmMapper.mapToFilmDto(filmStorage.findById(id));
     }
 
-    //Получить список популярных фильмов
-    public Collection<FilmDto> getPopular(int count) {
-        return filmStorage.getPopular(count).stream().map(FilmMapper::mapToFilmDto).toList();
+    //Получить count популярных фильмов по жанру и году
+    public Collection<FilmDto> getPopularFilmsByGenreIdByYear(int count, Integer genreId, Integer year) {
+        return filmStorage
+                .getPopularFilmsByGenreIdByYear(count, genreId, year)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
     }
 
     //Получить список всех рейтингов MPA
