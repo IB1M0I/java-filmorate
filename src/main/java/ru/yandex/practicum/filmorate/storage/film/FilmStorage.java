@@ -13,6 +13,4 @@ public interface FilmStorage {
     Film findById(long id);
 
     Collection<Film> findAll();
-
-    Collection<Film> getFilmsByDirectorSorted(long directorId, String sortBy);
 }

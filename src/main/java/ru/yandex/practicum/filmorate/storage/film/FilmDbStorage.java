@@ -31,7 +31,7 @@ import static ru.yandex.practicum.filmorate.storage.film.FilmSql.*;
 @Repository
 @Primary
 @RequiredArgsConstructor
-public class FilmDbStorage implements FilmStorage {
+public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     private final RowMapper<Film> rowMapper;
     private final JdbcTemplate jdbc;
 
@@ -56,6 +56,11 @@ public class FilmDbStorage implements FilmStorage {
         } else {
             film.setGenres(new LinkedHashSet<>());
         }
+
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            validateDirectors(film.getDirectors());  // Вызов нового приватного метода
+        }
+
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(con -> {
             PreparedStatement ps = con.prepareStatement(INSERT_FILM, Statement.RETURN_GENERATED_KEYS);
@@ -76,16 +81,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.setGenres(new LinkedHashSet<>());
             }
             if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-                for (Director director : film.getDirectors()) {
-                    Integer count = jdbc.queryForObject(
-                            "SELECT COUNT(*) FROM directors WHERE id = ?",
-                            Integer.class,
-                            director.getId()
-                    );
-                    if (count == null || count == 0) {
-                        throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
-                    }
-                }
                 insertDirectorsBatch(film.getId(), film.getDirectors());
             }
         } else {
@@ -103,6 +98,10 @@ public class FilmDbStorage implements FilmStorage {
             throw new ValidationException("Дата выпуска фильма не может быть раньше 28 декабря 1895 года");
         }
 
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            validateDirectors(film.getDirectors());  // Вызов нового приватного метода
+        }
+
         jdbc.update("DELETE FROM movie_genres WHERE film_id = ?", film.getId());
         jdbc.update("DELETE FROM film_directors WHERE film_id = ?", film.getId());
         jdbc.update(UPDATE_FILM, film.getName(),
@@ -115,16 +114,6 @@ public class FilmDbStorage implements FilmStorage {
         insertGenresBatch(film.getId(), film.getGenres());
 
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            for (Director director : film.getDirectors()) {
-                Integer count = jdbc.queryForObject(
-                        "SELECT COUNT(*) FROM directors WHERE id = ?",
-                        Integer.class,
-                        director.getId()
-                );
-                if (count == null || count == 0) {
-                    throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
-                }
-            }
             insertDirectorsBatch(film.getId(), film.getDirectors());
         }
 
@@ -368,5 +357,18 @@ public class FilmDbStorage implements FilmStorage {
                 return listDirector.size();
             }
         });
+    }
+
+    private void validateDirectors(Set<Director> directors) {
+        for (Director director : directors) {
+            Integer count = jdbc.queryForObject(
+                    "SELECT COUNT(*) FROM directors WHERE id = ?",
+                    Integer.class,
+                    director.getId()
+            );
+            if (count == null || count == 0) {
+                throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
+            }
+        }
     }
 }

@@ -103,12 +103,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     }
 
-    // Получить фильмы режиссера с сортировкой
-    @Override
-    public Collection<Film> getFilmsByDirectorSorted(long directorId, String sortBy) {
-        throw new UnsupportedOperationException("Метод не поддерживается в InMemory реализации");
-    }
-
     //Генерации id
     private long getNextId() {
         long currentId = films.keySet().stream().mapToLong(id -> id).max().orElse(0L);
