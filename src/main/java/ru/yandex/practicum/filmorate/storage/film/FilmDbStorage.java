@@ -162,9 +162,9 @@ public class FilmDbStorage implements FilmStorage {
         return jdbc.update(DELETE_LIKE, id, userId);
     }
 
-    //Получить список популярных фильмов
-    public Collection<Film> getPopular(int count) {
-        List<Film> popularFilm = jdbc.query(FIND_POPULAR, rowMapper, count);
+    //Получить count популярных фильмов по указанным жанру и году
+    public Collection<Film> getPopularFilmsByGenreIdByYear(int count, Integer genreId, Integer year) {
+        List<Film> popularFilm = jdbc.query(FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR, rowMapper, genreId, genreId, year, year, count);
 
         getLikesAndGenresByFilmId(popularFilm);
         return popularFilm;
