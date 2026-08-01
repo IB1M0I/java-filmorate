@@ -7,10 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.film.dto.NewFilmRequest;
@@ -129,8 +131,12 @@ public class FilmService {
     }
 
     //Получить общие фильмы
-    public Collection<FilmDto> getCommonFilm(long userId, long friendId) {
-        return filmStorage.getCommonFilm(userId, friendId).stream()
+    public Collection<FilmDto> getCommonFilms(long userId, long friendId) {
+        if (userId == friendId) {
+            throw new ValidationException("Оба пользователя указаны с одинаковым id");
+        }
+
+        return filmStorage.getCommonFilms(userId, friendId).stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }

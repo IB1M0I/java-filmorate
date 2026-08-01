@@ -101,12 +101,10 @@ public class FilmController {
 
     //Получить список общих фильмов с другом
     @GetMapping("/common")
-    public Collection<FilmDto> getCommonFilm(@RequestParam long userId, long friendId) {
-        if (userId == friendId) {
-            throw new ValidationException("Оба пользователя указаны с одинаковым id");
-        }
+    public Collection<FilmDto> getCommonFilms(@RequestParam long userId, long friendId) {
+
         log.debug("Пользователь {} ищет общие фильмы с пользователем {}", userId, friendId);
-        return filmService.getCommonFilm(userId, friendId);
+        return filmService.getCommonFilms(userId, friendId);
     }
 
 }

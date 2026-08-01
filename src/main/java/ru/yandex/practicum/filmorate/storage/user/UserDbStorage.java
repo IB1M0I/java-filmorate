@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,6 +20,7 @@ import static ru.yandex.practicum.filmorate.storage.user.UserSql.*;
 @RequiredArgsConstructor
 @Repository
 @Primary
+@Slf4j
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbc;
     private final RowMapper<User> rowMapper;
@@ -63,6 +65,7 @@ public class UserDbStorage implements UserStorage {
         try {
             return jdbc.queryForObject(FIND_USER_BY_ID, rowMapper, id);
         } catch (EmptyResultDataAccessException e) {
+            log.error("Пользователь с id " + id + " не найден");
             throw new NotFoundException("Пользователь с id " + id + " не найден");
         }
     }
