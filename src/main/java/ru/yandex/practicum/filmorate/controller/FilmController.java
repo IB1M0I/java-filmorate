@@ -98,5 +98,12 @@ public class FilmController {
         return films;
     }
 
+    //Получить список общих фильмов с другом
+    @GetMapping("/common")
+    public Collection<FilmDto> getCommonFilms(@RequestParam long userId, long friendId) {
+
+        log.debug("Пользователь {} ищет общие фильмы с пользователем {}", userId, friendId);
+        return filmService.getCommonFilms(userId, friendId);
+    }
 
 }

@@ -45,4 +45,15 @@ public class FilmSql {
     static final String FIND_ALL_GENRE = "SELECT * FROM genres";
     //SQL-запрос для поиска жанра по id
     static final String FIND_BY_ID_GENRE = "SELECT * FROM genres WHERE id = ?";
+
+    //SQL-запрос для поиска общих фильмов
+    static final String FIND_BY_COMMON_FILMS = """
+            SELECT f.*
+            FROM likes_movies lm1
+            JOIN likes_movies AS lm2 ON lm1.film_id = lm2.film_id
+            JOIN films AS f ON f.id = lm1.film_id
+            WHERE lm1.user_id = ? AND lm2.user_id = ?
+            GROUP BY f.id
+            ORDER BY COUNT(lm1.film_id) DESC;
+            """;
 }

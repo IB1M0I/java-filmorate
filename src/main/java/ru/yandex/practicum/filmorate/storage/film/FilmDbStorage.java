@@ -279,4 +279,20 @@ public class FilmDbStorage implements FilmStorage {
         });
 
     }
+
+    //Получить список общих фильмов двух пользователей
+    public Collection<Film> getCommonFilms(long userId, long friendId) {
+         List<Film> films = jdbc.query(FIND_BY_COMMON_FILMS, (rs, rowNum) -> {
+            Film film = new Film();
+            film.setId(rs.getLong("id"));
+            film.setName(rs.getString("name"));
+            film.setDescription(rs.getString("description"));
+            film.setReleaseDate(rs.getDate("release_date").toLocalDate());
+            film.setDuration(rs.getInt("duration"));
+            return film;
+        }, userId, friendId);
+         getLikesAndGenresByFilmId(films);
+         return films;
+
+    }
 }
