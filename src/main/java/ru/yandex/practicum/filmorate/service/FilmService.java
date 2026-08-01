@@ -123,4 +123,12 @@ public class FilmService {
     public Genre findGenreById(long id) {
         return filmStorage.findGenreById(id);
     }
+
+    //Получить фильмы режиссера с сортировкой
+    public Collection<FilmDto> getFilmsByDirector(long directorId, String sortBy) {
+        return filmStorage.getFilmsByDirectorSorted(directorId, sortBy)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
 }
