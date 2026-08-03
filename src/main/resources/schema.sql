@@ -79,7 +79,6 @@ CREATE TABLE IF NOT EXISTS events
 
     CONSTRAINT fk_ev_user_id FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT fk_ev_entity_id FOREIGN KEY (entity_id) REFERENCES users (id)
-)
 );
 
 --Создание таблицы отзывов

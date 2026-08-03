@@ -223,7 +223,7 @@ public class UserDbStorageTest {
 
         User saveUser = userDbStorage.addUser(user);
         User saveUser2 = userDbStorage.addUser(user2);
-        long timestamp = Instant.now().getEpochSecond();
+        long timestamp = Instant.now().toEpochMilli();
         long userId = saveUser.getId();
 
 
@@ -265,7 +265,7 @@ public class UserDbStorageTest {
 
         long userId = saveUser.getId();
 
-        userDbStorage.addEvent(Instant.now().getEpochSecond(), userId, EventType.FRIEND, Operation.ADD, saveUser2.getId());
+        userDbStorage.addEvent(Instant.now().toEpochMilli(), userId, EventType.FRIEND, Operation.ADD, saveUser2.getId());
 
 
         Collection<Event> events = userDbStorage.getEventsUser(userId);

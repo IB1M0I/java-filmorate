@@ -123,7 +123,7 @@ public class FilmDbStorage implements FilmStorage {
         int row = jdbc.update(LIKE_FILM, id, userId);
 
         if (row > 0) {
-            addEvent(Instant.now().getEpochSecond(), userId, EventType.LIKE, Operation.ADD, id);
+            addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.ADD, id);
             return film;
         }else{
             throw new RuntimeException("Не удалось добавить лайк");
@@ -134,7 +134,7 @@ public class FilmDbStorage implements FilmStorage {
     public int deleteLike(long id, long userId) {
         int row = jdbc.update(DELETE_LIKE, id, userId);
         if(row > 0){
-            addEvent(Instant.now().getEpochSecond(), userId, EventType.LIKE, Operation.REMOVE, id);
+            addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.REMOVE, id);
             return row;
         }else{
             throw new RuntimeException("Ну удалось удалить лайк");

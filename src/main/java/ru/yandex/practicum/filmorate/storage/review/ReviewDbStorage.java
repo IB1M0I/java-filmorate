@@ -42,7 +42,7 @@ public class ReviewDbStorage implements ReviewStorage {
         } else {
             throw new RuntimeException("Не удалось сохранить отзыв и получить id");
         }
-        addEvent(Instant.now().getEpochSecond(), review.getUserId(), EventType.REVIEW, Operation.ADD, review.getReviewId());
+        addEvent(Instant.now().toEpochMilli(), review.getUserId(), EventType.REVIEW, Operation.ADD, review.getReviewId());
         return review;
     }
 
@@ -51,7 +51,7 @@ public class ReviewDbStorage implements ReviewStorage {
         int row = jdbc.update(ReviewSqlQueries.UPDATE_REVIEW, review.getContent(), review.isPositive(), review.getReviewId());
 
         if (row > 0) {
-            addEvent(Instant.now().getEpochSecond(), review.getUserId(), EventType.REVIEW, Operation.UPDATE, review.getReviewId());
+            addEvent(Instant.now().toEpochMilli(), review.getUserId(), EventType.REVIEW, Operation.UPDATE, review.getReviewId());
             return findById(review.getReviewId());
         } else {
             throw new NotFoundException("не удалось обновить отзыв");
@@ -60,9 +60,10 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public void deleteReview(long id) {
+        Review review = findById(id);
         int row = jdbc.update(ReviewSqlQueries.DELETE_REVIEW, id);
         if (row > 0) {
-            addEvent(Instant.now().getEpochSecond(), id, EventType.REVIEW, Operation.REMOVE, id);
+            addEvent(Instant.now().toEpochMilli(), review.getUserId(), EventType.REVIEW, Operation.REMOVE, id);
         } else {
             throw new NotFoundException("не удалось удалить отзыв");
         }
