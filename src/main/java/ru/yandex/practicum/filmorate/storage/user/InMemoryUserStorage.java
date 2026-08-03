@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -106,6 +108,11 @@ public class InMemoryUserStorage implements UserStorage {
         log.trace("Вызван метод получения списка пользователей");
         log.info("Вернули список пользователей");
         return users.values();
+    }
+
+    @Override
+    public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
+
     }
 
 

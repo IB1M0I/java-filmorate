@@ -141,9 +141,9 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    //Получить список популярных фильмов
-    public Collection<Film> getPopular(int count) {
-        List<Film> popularFilm = jdbc.query(FIND_POPULAR, rowMapper, count);
+    //Получить count популярных фильмов по указанным жанру и году
+    public Collection<Film> getPopularFilmsByGenreIdByYear(int count, Integer genreId, Integer year) {
+        List<Film> popularFilm = jdbc.query(FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR, rowMapper, genreId, genreId, year, year, count);
 
         getLikesAndGenresByFilmId(popularFilm);
         return popularFilm;
@@ -292,7 +292,24 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     //Добавить событие
+    @Override
     public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
         jdbc.update(INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
+    }
+
+    //Получить список общих фильмов двух пользователей
+    public Collection<Film> getCommonFilms(long userId, long friendId) {
+         List<Film> films = jdbc.query(FIND_BY_COMMON_FILMS, (rs, rowNum) -> {
+            Film film = new Film();
+            film.setId(rs.getLong("id"));
+            film.setName(rs.getString("name"));
+            film.setDescription(rs.getString("description"));
+            film.setReleaseDate(rs.getDate("release_date").toLocalDate());
+            film.setDuration(rs.getInt("duration"));
+            return film;
+        }, userId, friendId);
+         getLikesAndGenresByFilmId(films);
+         return films;
+
     }
 }

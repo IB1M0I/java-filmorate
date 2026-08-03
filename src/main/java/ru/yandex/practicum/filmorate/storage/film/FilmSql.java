@@ -27,14 +27,15 @@ public class FilmSql {
 
     //SQL-запрос для удаления лайка с фильма
     static final String DELETE_LIKE = "DELETE FROM likes_movies WHERE film_id = ? AND user_id = ?";
-
-    //SQL-запрос для получения популярных фильмов
-    static final String FIND_POPULAR = """
-            SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
-            FROM films AS f
-            LEFT JOIN likes_movies AS lm ON f.id = lm.film_id
-            GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
-            ORDER BY COUNT(lm.film_id) DESC, f.id ASC
+    //SQL-запрос для получения count популярных фильмов по указанным жанру и году
+    static final String FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR = """
+            SELECT f.*
+            FROM films f
+            LEFT JOIN movie_genres mg ON f.id = mg.film_id
+            JOIN likes_movies lm ON f.id = lm.film_id
+            WHERE (mg.genre_id = ? OR ? IS NULL) AND (EXTRACT(YEAR FROM f.release_date) = ? OR ?  IS NULL)
+            GROUP BY f.id
+            ORDER BY count(*) DESC
             LIMIT ?""";
 
     //SQL-запрос для проверки существования рейтинга MPA
@@ -54,6 +55,17 @@ public class FilmSql {
 
     //SQL-запрос для поиска жанра по id
     static final String FIND_BY_ID_GENRE = "SELECT * FROM genres WHERE id = ?";
+
+    //SQL-запрос для поиска общих фильмов
+    static final String FIND_BY_COMMON_FILMS = """
+            SELECT f.*
+            FROM likes_movies lm1
+            JOIN likes_movies AS lm2 ON lm1.film_id = lm2.film_id
+            JOIN films AS f ON f.id = lm1.film_id
+            WHERE lm1.user_id = ? AND lm2.user_id = ?
+            GROUP BY f.id
+            ORDER BY COUNT(lm1.film_id) DESC;
+            """;
 
     //SQL-запрос для добавления события пользователя
     static final String INSERT_USER_EVENT = """
