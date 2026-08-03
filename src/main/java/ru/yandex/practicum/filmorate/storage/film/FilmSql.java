@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class FilmSql {
-    private FilmSql() {
-    }
+
 
     //SQL-запрос для добавления фильма
     static final String INSERT_FILM = "INSERT INTO films (name, description, release_date, duration, mpa_rating_id) VALUES (?,?,?,?,?)";

@@ -77,8 +77,7 @@ CREATE TABLE IF NOT EXISTS events
     operation  VARCHAR(10) NOT NULL,
     entity_id  BIGINT      NOT NULL,
 
-    CONSTRAINT fk_ev_user_id FOREIGN KEY (user_id) REFERENCES users (id),
-    CONSTRAINT fk_ev_entity_id FOREIGN KEY (entity_id) REFERENCES users (id)
+    CONSTRAINT fk_ev_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 --Создание таблицы отзывов

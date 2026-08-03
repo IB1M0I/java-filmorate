@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Operation;
@@ -94,7 +95,7 @@ public class UserDbStorageTest {
         userDbStorage.addUser(user1);
         userDbStorage.addUser(user2);
 
-        Assertions.assertThatThrownBy(() -> userDbStorage.findById(33)).isInstanceOf(EmptyResultDataAccessException.class);
+        Assertions.assertThatThrownBy(() -> userDbStorage.findById(33)).isInstanceOf(NotFoundException.class);
     }
 
     //Тест обновления пользователя

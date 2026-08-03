@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class UserSql {
-    private UserSql() {
-    }
 
     //SQL-запрос для добавления пользователя
     static final String INSERT_USER = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
