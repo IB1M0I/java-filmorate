@@ -90,10 +90,10 @@ public class UserDbStorage implements UserStorage {
         User user = findById(friendId);
         int row = jdbc.update(ADD_FRIEND, id, friendId, isConfirmed);
 
-        if(row > 0){
+        if (row > 0) {
             addEvent(Instant.now().getEpochSecond(), id, EventType.FRIEND, Operation.ADD, friendId);
             return user;
-        }else {
+        } else {
             throw new RuntimeException("Не удалось добавить друга");
         }
 
@@ -108,7 +108,7 @@ public class UserDbStorage implements UserStorage {
     public void deleteFriend(long id, long friendId) {
         int row = jdbc.update(DELETE_FRIEND, id, friendId);
 
-        if(row > 0){
+        if (row > 0) {
             addEvent(Instant.now().getEpochSecond(), id, EventType.FRIEND, Operation.REMOVE, friendId);
         }
     }

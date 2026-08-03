@@ -8,16 +8,16 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @JdbcTest
 @AutoConfigureTestDatabase
@@ -227,7 +227,6 @@ public class UserDbStorageTest {
         long userId = saveUser.getId();
 
 
-
         userDbStorage.addEvent(timestamp, userId, EventType.FRIEND, Operation.ADD, saveUser2.getId());
 
         Collection<Event> events = userDbStorage.getEventsUser(userId);
@@ -282,7 +281,6 @@ public class UserDbStorageTest {
                 .email("email@mail.com")
                 .birthday(LocalDate.now())
                 .build();
-
 
 
         User saveUser = userDbStorage.addUser(user);

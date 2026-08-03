@@ -125,7 +125,7 @@ public class FilmDbStorage implements FilmStorage {
         if (row > 0) {
             addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.ADD, id);
             return film;
-        }else{
+        } else {
             throw new RuntimeException("Не удалось добавить лайк");
         }
     }
@@ -133,10 +133,10 @@ public class FilmDbStorage implements FilmStorage {
     //Удалить лайк с фильма
     public int deleteLike(long id, long userId) {
         int row = jdbc.update(DELETE_LIKE, id, userId);
-        if(row > 0){
+        if (row > 0) {
             addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.REMOVE, id);
             return row;
-        }else{
+        } else {
             throw new RuntimeException("Ну удалось удалить лайк");
         }
     }
@@ -299,7 +299,7 @@ public class FilmDbStorage implements FilmStorage {
 
     //Получить список общих фильмов двух пользователей
     public Collection<Film> getCommonFilms(long userId, long friendId) {
-         List<Film> films = jdbc.query(FIND_BY_COMMON_FILMS, (rs, rowNum) -> {
+        List<Film> films = jdbc.query(FIND_BY_COMMON_FILMS, (rs, rowNum) -> {
             Film film = new Film();
             film.setId(rs.getLong("id"));
             film.setName(rs.getString("name"));
@@ -308,8 +308,8 @@ public class FilmDbStorage implements FilmStorage {
             film.setDuration(rs.getInt("duration"));
             return film;
         }, userId, friendId);
-         getLikesAndGenresByFilmId(films);
-         return films;
+        getLikesAndGenresByFilmId(films);
+        return films;
 
     }
 }
