@@ -9,7 +9,6 @@ public interface UserStorage {
 
     User updateUser(User user);
 
-
     User findById(long id);
 
     Collection<User> findAll();
