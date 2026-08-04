@@ -31,4 +31,10 @@ public class ReviewSqlQueries {
     public static final String UPDATE_USEFUL =
             "UPDATE reviews SET useful = (SELECT COUNT(CASE WHEN is_like = true THEN 1 END) - " +
                     "COUNT(CASE WHEN is_like = false THEN 1 END) FROM review_likes WHERE review_id = ?) WHERE review_id = ?";
+
+    //SQL-запрос для добавления события пользователя
+    public static final String INSERT_USER_EVENT = """
+            INSERT INTO EVENTS (timestamp, user_id, event_type, operation, entity_id)
+            VALUES (?, ?, ?, ?, ?)
+            """;
 }

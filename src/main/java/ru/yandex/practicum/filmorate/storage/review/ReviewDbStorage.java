@@ -6,12 +6,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.Collection;
+
 
 @Repository
 @RequiredArgsConstructor
@@ -38,18 +42,31 @@ public class ReviewDbStorage implements ReviewStorage {
         } else {
             throw new RuntimeException("Не удалось сохранить отзыв и получить id");
         }
+        addEvent(Instant.now().toEpochMilli(), review.getUserId(), EventType.REVIEW, Operation.ADD, review.getReviewId());
         return review;
     }
 
     @Override
     public Review updateReview(Review review) {
-        jdbc.update(ReviewSqlQueries.UPDATE_REVIEW, review.getContent(), review.isPositive(), review.getReviewId());
-        return findById(review.getReviewId());
+        int row = jdbc.update(ReviewSqlQueries.UPDATE_REVIEW, review.getContent(), review.isPositive(), review.getReviewId());
+
+        if (row > 0) {
+            addEvent(Instant.now().toEpochMilli(), review.getUserId(), EventType.REVIEW, Operation.UPDATE, review.getReviewId());
+            return findById(review.getReviewId());
+        } else {
+            throw new NotFoundException("не удалось обновить отзыв");
+        }
     }
 
     @Override
     public void deleteReview(long id) {
-        jdbc.update(ReviewSqlQueries.DELETE_REVIEW, id);
+        Review review = findById(id);
+        int row = jdbc.update(ReviewSqlQueries.DELETE_REVIEW, id);
+        if (row > 0) {
+            addEvent(Instant.now().toEpochMilli(), review.getUserId(), EventType.REVIEW, Operation.REMOVE, id);
+        } else {
+            throw new NotFoundException("не удалось удалить отзыв");
+        }
     }
 
     @Override
@@ -92,5 +109,10 @@ public class ReviewDbStorage implements ReviewStorage {
     public void deleteDislike(long reviewId, long userId) {
         jdbc.update(ReviewSqlQueries.DELETE_LIKE_DISLIKE, reviewId, userId);
         jdbc.update(ReviewSqlQueries.UPDATE_USEFUL, reviewId, reviewId);
+    }
+
+    //Добавить событие
+    public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
+        jdbc.update(ReviewSqlQueries.INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
     }
 }

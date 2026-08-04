@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.exeption;
+package ru.yandex.practicum.filmorate.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -47,6 +47,7 @@ public class ExceptionHandlers {
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleEmptyResultDataAccessException(final EmptyResultDataAccessException e) {
+        System.out.println("ОШИБКА!!!!!!!!!!!!!!!!!!!!!!!!!!");
         log.error("Ошибка доступа к данным: {}", e.getMessage());
         return Map.of("error", "Ошибка валидации");
     }
@@ -59,5 +60,6 @@ public class ExceptionHandlers {
         log.error("Внутренняя ошибка сервера: {}", e.getMessage(), e);
         return Map.of("error", e.getMessage());
     }
+
 
 }

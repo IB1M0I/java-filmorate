@@ -8,24 +8,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
-import ru.yandex.practicum.filmorate.exeption.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MpaRating;
-
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.INSERT_FILM_DIRECTOR;
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_DIRECTORS_BY_FILM_IDS;
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_FILMS_BY_DIRECTOR_SORT_BY_YEAR;
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_FILMS_BY_DIRECTOR_SORT_BY_LIKES;
-import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
+import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.*;
 import static ru.yandex.practicum.filmorate.storage.film.FilmSql.*;
 
 @Repository
@@ -142,13 +136,25 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     //Добавить лайк фильму
     public Film likeFilm(long id, long userId) {
         Film film = findById(id);
-        jdbc.update(LIKE_FILM, id, userId);
-        return film;
+        int row = jdbc.update(LIKE_FILM, id, userId);
+
+        if (row > 0) {
+            addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.ADD, id);
+            return film;
+        } else {
+            throw new RuntimeException("Не удалось добавить лайк");
+        }
     }
 
     //Удалить лайк с фильма
     public int deleteLike(long id, long userId) {
-        return jdbc.update(DELETE_LIKE, id, userId);
+        int row = jdbc.update(DELETE_LIKE, id, userId);
+        if (row > 0) {
+            addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.REMOVE, id);
+            return row;
+        } else {
+            throw new RuntimeException("Ну удалось удалить лайк");
+        }
     }
 
     //Получить count популярных фильмов по указанным жанру и году
@@ -335,6 +341,28 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
                 return listGenre.size();
             }
         });
+
+    }
+
+    //Добавить событие
+    @Override
+    public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
+        jdbc.update(INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
+    }
+
+    //Получить список общих фильмов двух пользователей
+    public Collection<Film> getCommonFilms(long userId, long friendId) {
+        List<Film> films = jdbc.query(FIND_BY_COMMON_FILMS, (rs, rowNum) -> {
+            Film film = new Film();
+            film.setId(rs.getLong("id"));
+            film.setName(rs.getString("name"));
+            film.setDescription(rs.getString("description"));
+            film.setReleaseDate(rs.getDate("release_date").toLocalDate());
+            film.setDuration(rs.getInt("duration"));
+            return film;
+        }, userId, friendId);
+        getLikesAndGenresByFilmId(films);
+        return films;
 
     }
 
