@@ -12,12 +12,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.INSERT_FILM_DIRECTOR;
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_DIRECTORS_BY_FILM_IDS;
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_FILMS_BY_DIRECTOR_SORT_BY_YEAR;
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_FILMS_BY_DIRECTOR_SORT_BY_LIKES;
-import ru.yandex.practicum.filmorate.model.Director;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
+import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.*;
 import static ru.yandex.practicum.filmorate.storage.film.FilmSql.*;
 
 @Repository
@@ -368,6 +363,9 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         }, userId, friendId);
         getLikesAndGenresByFilmId(films);
         return films;
+
+    }
+
     public void insertDirectorsBatch(long filmId, Set<Director> directors) {
         if (directors == null || directors.isEmpty()) {
             return;

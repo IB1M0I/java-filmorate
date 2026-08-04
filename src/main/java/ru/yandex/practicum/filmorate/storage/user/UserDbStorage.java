@@ -121,6 +121,7 @@ public class UserDbStorage implements UserStorage {
 
     //Получить события пользователя
     public Collection<Event> getEventsUser(long id) {
+        findById(id);
         return jdbc.query(FIND_USER_EVENT_ID, new EventRowMapper(), id);
     }
 

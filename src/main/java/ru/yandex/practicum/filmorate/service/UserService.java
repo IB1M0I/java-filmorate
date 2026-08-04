@@ -137,6 +137,7 @@ public class UserService {
 
     //Получить события пользователя
     public Collection<Event> getEventsUser(long id) {
+
         return userStorage.getEventsUser(id);
     }
 }
