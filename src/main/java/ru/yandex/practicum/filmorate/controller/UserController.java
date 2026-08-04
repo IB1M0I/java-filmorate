@@ -100,7 +100,10 @@ public class UserController {
     // Получить рекомендации по фильмам
     @GetMapping("/{id}/recommendations")
     public Collection<FilmDto> getRecommendations(@PathVariable @NotNull @Positive Long id) {
-        return userService.getRecommendations(id);
+        log.debug("Получен запрос на получение рекомендаций по фильмам для пользователя с id = {}", id);
+        Collection<FilmDto> recommendations = userService.getRecommendations(id);
+        log.info("Получено {} рекомендованных фильмов для пользователя с id = {}", recommendations.size(), id);
+        return recommendations;
     }
 
 }
