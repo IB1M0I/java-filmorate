@@ -58,13 +58,16 @@ CREATE TABLE IF NOT EXISTS friendships
 );
 
 --Создание таблицы лайков фильмов
-CREATE TABLE IF NOT EXISTS likes_movies
+CREATE TABLE IF NOT EXISTS rating_movies
 (
-    film_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
+    film_id BIGINT  NOT NULL,
+    user_id BIGINT  NOT NULL,
+    rating  INTEGER NOT NULL,
     PRIMARY KEY (film_id, user_id),
-    CONSTRAINT fk_likes_movies_films FOREIGN KEY (film_id) REFERENCES films (id) ON DELETE CASCADE,
-    CONSTRAINT fk_likes_movies_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    CONSTRAINT fk_rating_movies_films FOREIGN KEY (film_id) REFERENCES films (id) ON DELETE CASCADE,
+    CONSTRAINT fk_rating_movies_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_rating_likes_users CHECK (rating BETWEEN 1 AND 10)
+
 );
 
 --Создание таблицы событий

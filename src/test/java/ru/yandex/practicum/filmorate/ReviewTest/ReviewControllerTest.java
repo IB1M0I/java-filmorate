@@ -37,7 +37,7 @@ class ReviewControllerTest {
     void setUp() {
         jdbcTemplate.update("DELETE FROM review_likes");
         jdbcTemplate.update("DELETE FROM reviews");
-        jdbcTemplate.update("DELETE FROM likes_movies");
+        jdbcTemplate.update("DELETE FROM rating_movies");
         jdbcTemplate.update("DELETE FROM friendships");
         jdbcTemplate.update("DELETE FROM movie_genres");
         jdbcTemplate.update("DELETE FROM films");

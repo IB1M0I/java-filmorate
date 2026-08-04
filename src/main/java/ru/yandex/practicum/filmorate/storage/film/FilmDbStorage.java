@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -28,6 +29,7 @@ import static ru.yandex.practicum.filmorate.storage.film.FilmSql.*;
 public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     private final RowMapper<Film> rowMapper;
     private final JdbcTemplate jdbc;
+    private final UserDbStorage userDbStorage;
 
     //Добавить фильм в базу данных
     @Override
@@ -120,6 +122,9 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     public Film findById(long id) {
         try {
             Film film = jdbc.queryForObject(FIND_FILM_BY_ID, rowMapper, id);
+            if(film == null){
+                throw new NotFoundException("Фильм не найден");
+            }
             getLikesAndGenresByFilmId(List.of(film));
             return film;
         } catch (EmptyResultDataAccessException e) {
@@ -136,7 +141,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     //Добавить лайк фильму
     public Film likeFilm(long id, long userId) {
         Film film = findById(id);
-        int row = jdbc.update(LIKE_FILM, id, userId);
+        int row = jdbc.update(ADD_RATING_FILM, id, userId,10);
 
         if (row > 0) {
             addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.ADD, id);
@@ -220,9 +225,6 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
             if (film.getGenres() == null) {
                 film.setGenres(new LinkedHashSet<>());
             }
-            if (film.getLikes() == null) {
-                film.setLikes(new HashSet<>());
-            }
         }
 
         String inClause = String.join(",", Collections.nCopies(films.size(), "?"));
@@ -248,16 +250,15 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
             }
         }, filmIds);
 
-        String getLike = "SELECT film_id, user_id FROM likes_movies " +
-                "WHERE film_id IN (" + inClause + ")";
+        String getRating = "SELECT film_id, AVG(rating) AS rating FROM rating_movies " +
+                "WHERE film_id IN (" + inClause + ") " +
+                "GROUP BY film_id";
 
-        jdbc.query(getLike, (rs) -> {
+        jdbc.query(getRating, (rs) -> {
             long filmId = rs.getLong("film_id");
-            long userId = rs.getLong("user_id");
-
             Film film = filmMap.get(filmId);
             if (film != null) {
-                film.getLikes().add(userId);
+                film.setRating(rs.getDouble("rating"));
             }
         }, filmIds);
 
@@ -364,6 +365,13 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         getLikesAndGenresByFilmId(films);
         return films;
 
+    }
+
+    public void addRatingFilm(long filmId, long userId, int rating) {
+        findById(filmId);
+        userDbStorage.findById(userId);
+
+        jdbc.update(ADD_RATING_FILM,filmId,userId,rating);
     }
 
     public void insertDirectorsBatch(long filmId, Set<Director> directors) {

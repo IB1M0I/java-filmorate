@@ -21,20 +21,20 @@ public class FilmSql {
     //SQL-запрос для добавления жанра к фильму
     static final String INSERT_GENRE_TO_FILM = "MERGE INTO movie_genres (film_id, genre_id) KEY (film_id,genre_id) VALUES (?,?)";
 
-    //SQL-запрос для добавления лайка фильму
-    static final String LIKE_FILM = """
-            MERGE INTO likes_movies (film_id, user_id)\s
+    //SQL-запрос для добавления рейтинга фильму
+    static final String ADD_RATING_FILM = """
+            MERGE INTO rating_movies (film_id, user_id, rating)\s
             KEY(film_id, user_id)\s
-            VALUES (?, ?);""";
+            VALUES (?, ?, ?);""";
 
     //SQL-запрос для удаления лайка с фильма
-    static final String DELETE_LIKE = "DELETE FROM likes_movies WHERE film_id = ? AND user_id = ?";
+    static final String DELETE_LIKE = "DELETE FROM rating_movies WHERE film_id = ? AND user_id = ?";
     //SQL-запрос для получения count популярных фильмов по указанным жанру и году
     static final String FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR = """
             SELECT f.*
             FROM films f
             LEFT JOIN movie_genres mg ON f.id = mg.film_id
-            JOIN likes_movies lm ON f.id = lm.film_id
+            JOIN rating_movies lm ON f.id = lm.film_id
             WHERE (mg.genre_id = ? OR ? IS NULL) AND (EXTRACT(YEAR FROM f.release_date) = ? OR ?  IS NULL)
             GROUP BY f.id
             ORDER BY count(*) DESC
@@ -61,8 +61,8 @@ public class FilmSql {
     //SQL-запрос для поиска общих фильмов
     static final String FIND_BY_COMMON_FILMS = """
             SELECT f.*
-            FROM likes_movies lm1
-            JOIN likes_movies AS lm2 ON lm1.film_id = lm2.film_id
+            FROM rating_movies lm1
+            JOIN rating_movies AS lm2 ON lm1.film_id = lm2.film_id
             JOIN films AS f ON f.id = lm1.film_id
             WHERE lm1.user_id = ? AND lm2.user_id = ?
             GROUP BY f.id

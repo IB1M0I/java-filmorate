@@ -17,6 +17,6 @@ public class FilmDto {
     private Integer duration;
     private MpaRating mpa;
     private Set<Genre> genres;
-    private Set<Long> likes;
+    private Double rating;
     private Set<Director> directors;
 }

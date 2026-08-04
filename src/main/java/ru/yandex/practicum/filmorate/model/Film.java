@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,7 +35,10 @@ public class Film {
 
     private MpaRating mpa; //MPA рейтинг
 
-    private Set<Long> likes = new HashSet<>(); //Лайки
+    @Min(1)
+    @Max(10)
+    @JsonProperty("rate")
+    private Double rating = 0.0;
 
     private Set<Director> directors = new HashSet<>();
 }

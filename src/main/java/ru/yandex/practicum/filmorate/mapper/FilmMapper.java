@@ -23,7 +23,7 @@ public class FilmMapper {
         filmDto.setReleaseDate(film.getReleaseDate());
         filmDto.setMpa(film.getMpa());
         filmDto.setGenres(film.getGenres());
-        filmDto.setLikes(film.getLikes());
+        filmDto.setRating(film.getRating());
         filmDto.setDirectors(film.getDirectors());
         return filmDto;
     }
@@ -42,7 +42,7 @@ public class FilmMapper {
             film.setMpa(new MpaRating());
         }
         film.setGenres(request.getGenres());
-        film.setLikes(new HashSet<Long>());
+        //film.setLikes(new HashSet<Long>());
         if (request.getDirectors() != null) {
             film.setDirectors(request.getDirectors());
         } else {
@@ -73,6 +73,9 @@ public class FilmMapper {
         }
         if (request.hasDirectors()) {
             film.setDirectors(request.getDirectors());
+        }
+        if(request.hasRating()){
+            film.setRating(request.getRating());
         }
         return film;
 
