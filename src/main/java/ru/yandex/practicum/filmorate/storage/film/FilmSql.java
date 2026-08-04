@@ -56,4 +56,13 @@ public class FilmSql {
             GROUP BY f.id
             ORDER BY COUNT(lm1.film_id) DESC;
             """;
+
+    //SQL-запрос для поиска фильмов по названию и
+    static final String FIND_FILMS_BY_TITLE_BY_DIRECTOR = """
+            SELECT f.*
+            FROM films f
+            LEFT JOIN film_directors fd ON f.id = fd.film_id
+            LEFT JOIN directors d ON fd.director_id = d.id
+            WHERE ? AND LOWER(f.name) LIKE '%' || LOWER(?) || '%'
+            	OR ? AND LOWER(d.name) LIKE '%' || LOWER(?) || '%'""";
 }

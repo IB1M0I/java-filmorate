@@ -110,4 +110,23 @@ public class FilmController {
         return films;
     }
 
+    /**
+     *
+     * @param query текст для поиска
+     * @param by    может принимать значения director (поиск по режиссёру),
+     *              title (поиск по названию),
+     *              либо оба значения через запятую при поиске одновременно и по режиссеру и по названию
+     * @return возвращает список фильмов, отсортированных по популярности
+     */
+    @GetMapping("/search")
+    public Collection<FilmDto> searchFilmsByTitleByDirector(
+            @RequestParam @NotNull String query,
+            @RequestParam @NotNull String by
+    ) {
+        log.debug("Получен запрос на поиск по названию фильмов и по режиссёру {}: {}", by, query);
+        Collection<FilmDto> filmsByTitleByDirector = filmService.searchFilmsByTitleByDirector(query, by);
+        log.info("Получено {} фильмов по названию и по режиссёру {}", filmsByTitleByDirector.size(), query);
+        return filmsByTitleByDirector;
+    }
+
 }

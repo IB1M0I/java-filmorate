@@ -10,15 +10,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
-
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.INSERT_FILM_DIRECTOR;
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_DIRECTORS_BY_FILM_IDS;
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_FILMS_BY_DIRECTOR_SORT_BY_YEAR;
-import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.FIND_FILMS_BY_DIRECTOR_SORT_BY_LIKES;
-import ru.yandex.practicum.filmorate.model.Director;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -26,6 +21,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.*;
 
+import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.*;
 import static ru.yandex.practicum.filmorate.storage.film.FilmSql.*;
 
 @Repository
@@ -370,5 +366,11 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
                 throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
             }
         }
+    }
+
+    public Collection<Film> searchFilmsByTitleByDirector(String query, boolean title, boolean director) {
+        return getLikesAndGenresByFilmId(
+                jdbc.query(FIND_FILMS_BY_TITLE_BY_DIRECTOR, rowMapper, title, query, director, query)
+        );
     }
 }
