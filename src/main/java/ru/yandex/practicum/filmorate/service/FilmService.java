@@ -131,13 +131,10 @@ public class FilmService {
         return filmStorage.findGenreById(id);
     }
 
-    //Получить общие фильмы
-    public Collection<FilmDto> getCommonFilms(long userId, long friendId) {
-        if (userId == friendId) {
-            throw new ValidationException("Оба пользователя указаны с одинаковым id");
-        }
-
-        return filmStorage.getCommonFilms(userId, friendId).stream()
+    //Получить фильмы режиссера с сортировкой
+    public Collection<FilmDto> getFilmsByDirector(long directorId, String sortBy) {
+        return filmStorage.getFilmsByDirectorSorted(directorId, sortBy)
+                .stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
