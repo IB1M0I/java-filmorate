@@ -399,4 +399,10 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
             }
         }
     }
+
+    public Collection<Film> searchFilmsByTitleByDirector(String query, boolean title, boolean director) {
+        return getLikesAndGenresByFilmId(
+                jdbc.query(FIND_FILMS_BY_TITLE_BY_DIRECTOR, rowMapper, title, query, director, query)
+        );
+    }
 }

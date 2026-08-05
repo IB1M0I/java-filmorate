@@ -74,4 +74,23 @@ public class FilmSql {
             INSERT INTO EVENTS (timestamp, user_id, event_type, operation, entity_id)
             VALUES (?, ?, ?, ?, ?)
             """;
+
+    //SQL-запрос для поиска фильмов по названию и
+    static final String FIND_FILMS_BY_TITLE_BY_DIRECTOR = """
+            SELECT
+                f.id,
+                f.name,
+                f.description,
+                f.release_date,
+                f.duration,
+                f.mpa_rating_id,
+                COUNT(lm.user_id) AS likes_count
+            FROM films f
+            LEFT JOIN film_directors fd ON f.id = fd.film_id
+            LEFT JOIN directors d ON fd.director_id = d.id
+            LEFT JOIN likes_movies lm ON f.id = lm.film_id
+            WHERE ? AND LOWER(f.name) LIKE '%' || LOWER(?) || '%'
+                OR ? AND LOWER(d.name) LIKE '%' || LOWER(?) || '%'
+            GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
+            ORDER BY likes_count DESC""";
 }

@@ -10,12 +10,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MpaRating;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmSql;
+import ru.yandex.practicum.filmorate.storage.mapper.DirectorRowMapper;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
@@ -31,10 +30,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({FilmDbStorage.class, FilmRowMapper.class,
-        UserDbStorage.class, UserRowMapper.class})
+        UserDbStorage.class, UserRowMapper.class,
+        DirectorDbStorage.class, DirectorRowMapper.class})
 public class FilmDbStorageTest extends FilmSql {
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
+    private final DirectorDbStorage directorStorage;
 
     //Тест создания фильма
     @Test
@@ -480,5 +481,335 @@ public class FilmDbStorageTest extends FilmSql {
                 .hasSize(1)
                 .extracting(Film::getId)
                 .containsExactly(film3.getId());
+    }
+
+    @Test
+    @DisplayName("Поиск фильмов по названию")
+    void testSearchFilmsByTitleByDirectorWhenTitleReturnsFilms() {
+        Director director1 = new Director(1L, "Режиссёр1");
+        Director director2 = new Director(2L, "Режиссёр2");
+        Director director3 = new Director(3L, "Режиссёр3");
+        directorStorage.create(director1);
+        directorStorage.create(director2);
+        directorStorage.create(director3);
+
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.of(1985, 11, 30))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director1))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.of(1957, 9, 11))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .directors(Set.of(director2))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.of(1987, 6, 12))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        Collection<Film> films = filmStorage.searchFilmsByTitleByDirector("фильм", true, false);
+
+        assertThat(films)
+                .isNotNull()
+                .hasSize(3)
+                .extracting(Film::getId)
+                .containsExactly(film1.getId(), film2.getId(), film3.getId());
+    }
+
+    @Test
+    @DisplayName("Поиск по режиссёру")
+    void testSearchFilmsByTitleByDirectorWhenDirectorReturnsFilms() {
+        Director director1 = new Director(1L, "Режиссёр1");
+        Director director2 = new Director(2L, "Режиссёр2");
+        Director director3 = new Director(3L, "Режиссёр3");
+        directorStorage.create(director1);
+        directorStorage.create(director2);
+        directorStorage.create(director3);
+
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.of(1985, 11, 30))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director1))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.of(1957, 9, 11))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .directors(Set.of(director2))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.of(1987, 6, 12))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        Collection<Film> films = filmStorage.searchFilmsByTitleByDirector("режиссёр", false, true);
+
+        assertThat(films)
+                .isNotNull()
+                .hasSize(3)
+                .extracting(Film::getId)
+                .containsExactly(film1.getId(), film2.getId(), film3.getId());
+    }
+
+    @Test
+    @DisplayName("Поиск по названию фильмов и по режиссёру")
+    void testSearchFilmsByTitleByDirectorWhenTitleAndDirectorReturnsFilms() {
+        Director director1 = new Director(1L, "Режиссёр1");
+        Director director2 = new Director(2L, "Режиссёр2");
+        Director director3 = new Director(3L, "Режиссёр3");
+        directorStorage.create(director1);
+        directorStorage.create(director2);
+        directorStorage.create(director3);
+
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.of(1985, 11, 30))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director1))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.of(1957, 9, 11))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .directors(Set.of(director2))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.of(1987, 6, 12))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        Collection<Film> films = filmStorage.searchFilmsByTitleByDirector("и", true, true);
+
+        assertThat(films)
+                .isNotNull()
+                .hasSize(3)
+                .extracting(Film::getId)
+                .containsExactly(film1.getId(), film2.getId(), film3.getId());
+    }
+
+    @Test
+    @DisplayName("Поиск по неизвестному параметру")
+    void testSearchFilmsByTitleByDirectorWhenUnknownParameterReturnsEmptyList() {
+        Director director1 = new Director(1L, "Режиссёр1");
+        Director director2 = new Director(2L, "Режиссёр2");
+        Director director3 = new Director(3L, "Режиссёр3");
+        directorStorage.create(director1);
+        directorStorage.create(director2);
+        directorStorage.create(director3);
+
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.of(1985, 11, 30))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director1))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.of(1957, 9, 11))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .directors(Set.of(director2))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.of(1987, 6, 12))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        Collection<Film> films = filmStorage.searchFilmsByTitleByDirector("и", false, false);
+        assertThat(films).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Поиск фильмов по названию - возвращает пустой список")
+    void testSearchFilmsByTitleByDirectorWhenTitleReturnsEmpty() {
+        Director director1 = new Director(1L, "Режиссёр1");
+        Director director2 = new Director(2L, "Режиссёр2");
+        Director director3 = new Director(3L, "Режиссёр3");
+        directorStorage.create(director1);
+        directorStorage.create(director2);
+        directorStorage.create(director3);
+
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.of(1985, 11, 30))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director1))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.of(1957, 9, 11))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .directors(Set.of(director2))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.of(1987, 6, 12))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        Collection<Film> films = filmStorage.searchFilmsByTitleByDirector("описание", true, false);
+        assertThat(films).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Поиск по режиссёру - возвращает пустой список")
+    void testSearchFilmsByTitleByDirectorWhenDirectorReturnsEmpty() {
+        Director director1 = new Director(1L, "Режиссёр1");
+        Director director2 = new Director(2L, "Режиссёр2");
+        Director director3 = new Director(3L, "Режиссёр3");
+        directorStorage.create(director1);
+        directorStorage.create(director2);
+        directorStorage.create(director3);
+
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.of(1985, 11, 30))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director1))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.of(1957, 9, 11))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .directors(Set.of(director2))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.of(1987, 6, 12))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        Collection<Film> films = filmStorage.searchFilmsByTitleByDirector("описание", false, true);
+        assertThat(films).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Поиск по названию фильмов и по режиссёру - возвращает пустой список")
+    void testSearchFilmsByTitleByDirectorWhenTitleAndDirectorReturnsEmpty() {
+        Director director1 = new Director(1L, "Режиссёр1");
+        Director director2 = new Director(2L, "Режиссёр2");
+        Director director3 = new Director(3L, "Режиссёр3");
+        directorStorage.create(director1);
+        directorStorage.create(director2);
+        directorStorage.create(director3);
+
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.of(1985, 11, 30))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director1))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.of(1957, 9, 11))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .directors(Set.of(director2))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.of(1987, 6, 12))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .directors(Set.of(director3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        Collection<Film> films = filmStorage.searchFilmsByTitleByDirector("описание", true, true);
+        assertThat(films).isEmpty();
     }
 }
