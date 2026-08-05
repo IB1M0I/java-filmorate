@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.exeption;
+package ru.yandex.practicum.filmorate.exception;
 
 public class NotFoundException extends RuntimeException {
     //Конструктор исключения для случая когда ресурс не найден

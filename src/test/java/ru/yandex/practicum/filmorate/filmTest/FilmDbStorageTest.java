@@ -2,31 +2,39 @@ package ru.yandex.practicum.filmorate.filmTest;
 
 import lombok.RequiredArgsConstructor;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
-import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmSql;
 import ru.yandex.practicum.filmorate.storage.mapper.FilmRowMapper;
+import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({FilmDbStorage.class, FilmRowMapper.class})
+@Import({FilmDbStorage.class, FilmRowMapper.class,
+        UserDbStorage.class, UserRowMapper.class})
 public class FilmDbStorageTest extends FilmSql {
     private final FilmDbStorage filmStorage;
+    private final UserDbStorage userStorage;
 
     //Тест создания фильма
     @Test
@@ -196,5 +204,281 @@ public class FilmDbStorageTest extends FilmSql {
         film.setDescription("Описание");
 
         Assertions.assertThatThrownBy(() -> filmStorage.addFilm(film)).isInstanceOf(ValidationException.class);
+    }
+
+    @Test
+    @DisplayName("Самые популярные фильмы")
+    void testGetPopularFilms() {
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.now())
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.now())
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.now())
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        User user1 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        User user2 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        User user3 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        userStorage.addUser(user1);
+        userStorage.addUser(user2);
+        userStorage.addUser(user3);
+
+        filmStorage.likeFilm(film1.getId(), user1.getId());
+        filmStorage.likeFilm(film2.getId(), user1.getId());
+        filmStorage.likeFilm(film2.getId(), user2.getId());
+        filmStorage.likeFilm(film2.getId(), user3.getId());
+        filmStorage.likeFilm(film3.getId(), user2.getId());
+        filmStorage.likeFilm(film3.getId(), user3.getId());
+
+        Collection<Film> popularFilms = filmStorage.getPopularFilmsByGenreIdByYear(2, null, null);
+
+        assertThat(popularFilms)
+                .isNotNull()
+                .hasSize(2)
+                .extracting(Film::getId)
+                .containsExactly(film2.getId(), film3.getId());
+    }
+
+    @Test
+    @DisplayName("Самые популярные фильмы по жанру")
+    void testGetPopularFilmsByGenre() {
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.now())
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.now())
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.now())
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        User user1 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        User user2 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        User user3 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        userStorage.addUser(user1);
+        userStorage.addUser(user2);
+        userStorage.addUser(user3);
+
+        filmStorage.likeFilm(film1.getId(), user1.getId());
+        filmStorage.likeFilm(film2.getId(), user1.getId());
+        filmStorage.likeFilm(film2.getId(), user2.getId());
+        filmStorage.likeFilm(film2.getId(), user3.getId());
+        filmStorage.likeFilm(film3.getId(), user2.getId());
+        filmStorage.likeFilm(film3.getId(), user3.getId());
+
+        Collection<Film> popularFilms = filmStorage.getPopularFilmsByGenreIdByYear(2, 4, null);
+
+        assertThat(popularFilms)
+                .isNotNull()
+                .hasSize(1)
+                .extracting(Film::getId)
+                .containsExactly(film2.getId());
+    }
+
+    @Test
+    @DisplayName("Самые популярные фильмы по году")
+    void testGetPopularFilmsByYear() {
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.of(1985, 11, 30))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.of(1957, 9, 11))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.of(1987, 6, 12))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        User user1 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        User user2 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        User user3 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        userStorage.addUser(user1);
+        userStorage.addUser(user2);
+        userStorage.addUser(user3);
+
+        filmStorage.likeFilm(film1.getId(), user1.getId());
+        filmStorage.likeFilm(film2.getId(), user1.getId());
+        filmStorage.likeFilm(film2.getId(), user2.getId());
+        filmStorage.likeFilm(film2.getId(), user3.getId());
+        filmStorage.likeFilm(film3.getId(), user2.getId());
+        filmStorage.likeFilm(film3.getId(), user3.getId());
+
+        Collection<Film> popularFilms = filmStorage.getPopularFilmsByGenreIdByYear(2, null, 1987);
+
+        assertThat(popularFilms)
+                .isNotNull()
+                .hasSize(1)
+                .extracting(Film::getId)
+                .containsExactly(film3.getId());
+    }
+
+    @Test
+    @DisplayName("Самые популярные фильмы по жанру и году")
+    void testGetPopularFilmsByGenreByYear() {
+        Film film1 = Film.builder()
+                .name("Фильм")
+                .description("Описание")
+                .duration(100)
+                .releaseDate(LocalDate.of(1985, 11, 30))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .build();
+        Film film2 = Film.builder()
+                .name("Фильм2")
+                .description("Описание2")
+                .duration(200)
+                .releaseDate(LocalDate.of(1957, 9, 11))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(4))))
+                .mpa(new MpaRating(1))
+                .build();
+        Film film3 = Film.builder()
+                .name("Фильм3")
+                .description("Описание3")
+                .duration(100)
+                .releaseDate(LocalDate.of(1987, 6, 12))
+                .genres(new LinkedHashSet<>(Set.of(new Genre(2))))
+                .mpa(new MpaRating(3))
+                .build();
+        filmStorage.addFilm(film1);
+        filmStorage.addFilm(film2);
+        filmStorage.addFilm(film3);
+
+        User user1 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        User user2 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        User user3 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+        userStorage.addUser(user1);
+        userStorage.addUser(user2);
+        userStorage.addUser(user3);
+
+        filmStorage.likeFilm(film1.getId(), user1.getId());
+        filmStorage.likeFilm(film2.getId(), user1.getId());
+        filmStorage.likeFilm(film2.getId(), user2.getId());
+        filmStorage.likeFilm(film2.getId(), user3.getId());
+        filmStorage.likeFilm(film3.getId(), user2.getId());
+        filmStorage.likeFilm(film3.getId(), user3.getId());
+
+        Collection<Film> popularFilms = filmStorage.getPopularFilmsByGenreIdByYear(2, 2, 1987);
+
+        assertThat(popularFilms)
+                .isNotNull()
+                .hasSize(1)
+                .extracting(Film::getId)
+                .containsExactly(film3.getId());
     }
 }

@@ -1,18 +1,24 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.mapper.EventRowMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.time.Instant;
 import java.util.Collection;
 
 import static ru.yandex.practicum.filmorate.storage.user.UserSql.*;
@@ -20,10 +26,12 @@ import static ru.yandex.practicum.filmorate.storage.user.UserSql.*;
 @RequiredArgsConstructor
 @Repository
 @Primary
+@Slf4j
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbc;
     private final RowMapper<User> rowMapper;
     private final RowMapper<Film> filmRowMapper;
+
 
     //Добавить пользователя в базу данных
     @Override
@@ -63,6 +71,7 @@ public class UserDbStorage implements UserStorage {
         try {
             return jdbc.queryForObject(FIND_USER_BY_ID, rowMapper, id);
         } catch (EmptyResultDataAccessException e) {
+            log.error("Пользователь с id " + id + " не найден");
             throw new NotFoundException("Пользователь с id " + id + " не найден");
         }
     }
@@ -81,8 +90,15 @@ public class UserDbStorage implements UserStorage {
     //Добавить друга
     public User addFriend(long id, long friendId, boolean isConfirmed) {
         User user = findById(friendId);
-        jdbc.update(ADD_FRIEND, id, friendId, isConfirmed);
-        return user;
+        int row = jdbc.update(ADD_FRIEND, id, friendId, isConfirmed);
+
+        if (row > 0) {
+            addEvent(Instant.now().toEpochMilli(), id, EventType.FRIEND, Operation.ADD, friendId);
+            return user;
+        } else {
+            throw new RuntimeException("Не удалось добавить друга");
+        }
+
     }
 
     //Обновить статус подтверждения дружбы
@@ -92,8 +108,13 @@ public class UserDbStorage implements UserStorage {
 
     //Удалить друга
     public void deleteFriend(long id, long friendId) {
-        jdbc.update(DELETE_FRIEND, id, friendId);
+        int row = jdbc.update(DELETE_FRIEND, id, friendId);
+
+        if (row > 0) {
+            addEvent(Instant.now().toEpochMilli(), id, EventType.FRIEND, Operation.REMOVE, friendId);
+        }
     }
+
 
     //Получить список общих друзей двух пользователей
     public Collection<User> getCommonFriends(long id, long otherId) {
@@ -102,5 +123,15 @@ public class UserDbStorage implements UserStorage {
 
     public Collection<Film> getRecommendations(long id) {
         return jdbc.query(GET_RECOMMENDATIONS, filmRowMapper, id, id);
+    //Получить события пользователя
+    public Collection<Event> getEventsUser(long id) {
+        findById(id);
+        return jdbc.query(FIND_USER_EVENT_ID, new EventRowMapper(), id);
+    }
+
+    //Добавить событие
+    @Override
+    public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
+        jdbc.update(INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
     }
 }

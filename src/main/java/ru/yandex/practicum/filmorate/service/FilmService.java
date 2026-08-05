@@ -6,7 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -72,6 +72,7 @@ public class FilmService {
             throw new NotFoundException(String.format("Пользователь с id = %d не найден, поставить лайк не получилось", userId));
         }
 
+
         return FilmMapper.mapToFilmDto(
                 filmStorage.likeFilm(id, userId)
         );
@@ -99,9 +100,13 @@ public class FilmService {
         return FilmMapper.mapToFilmDto(filmStorage.findById(id));
     }
 
-    //Получить список популярных фильмов
-    public Collection<FilmDto> getPopular(int count) {
-        return filmStorage.getPopular(count).stream().map(FilmMapper::mapToFilmDto).toList();
+    //Получить count популярных фильмов по жанру и году
+    public Collection<FilmDto> getPopularFilmsByGenreIdByYear(int count, Integer genreId, Integer year) {
+        return filmStorage
+                .getPopularFilmsByGenreIdByYear(count, genreId, year)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
     }
 
     //Получить список всех рейтингов MPA
@@ -122,5 +127,13 @@ public class FilmService {
     //Получить жанр по id
     public Genre findGenreById(long id) {
         return filmStorage.findGenreById(id);
+    }
+
+    //Получить фильмы режиссера с сортировкой
+    public Collection<FilmDto> getFilmsByDirector(long directorId, String sortBy) {
+        return filmStorage.getFilmsByDirectorSorted(directorId, sortBy)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
     }
 }

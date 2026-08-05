@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.user.dto.NewUserRequest;
@@ -68,6 +69,7 @@ public class UserController {
         UserDto user = userService.addFriend(id, friendId);
         log.info("Пользователь {} успешно добавлен в друзья пользователю {}", friendId, id);
         return user;
+
     }
 
     //Получить список друзей пользователя
@@ -104,6 +106,10 @@ public class UserController {
         Collection<FilmDto> recommendations = userService.getRecommendations(id);
         log.info("Получено {} рекомендованных фильмов для пользователя с id = {}", recommendations.size(), id);
         return recommendations;
+    //Получить события пользователя по id
+    @GetMapping("/{id}/feed")
+    public Collection<Event> getEventsUser(@PathVariable long id) {
+        return userService.getEventsUser(id);
     }
 
 }
