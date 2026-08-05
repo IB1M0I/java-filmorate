@@ -140,4 +140,9 @@ public class FilmService {
     public void addRatingFilm(long filmId, long userId, int rating) {
         filmStorage.addRatingFilm(filmId,userId,rating);
     }
+
+
+    public void deleteFilm(long id) {
+        filmStorage.deleteFilm(id);
+    }
 }

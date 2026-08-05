@@ -65,6 +65,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
             ps.setObject(3, film.getReleaseDate());
             ps.setObject(4, film.getDuration());
             ps.setObject(5, film.getMpa().getId());
+            ps.setObject(6, film.getRating());
             return ps;
         }, keyHolder);
 
@@ -105,6 +106,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
                 film.getReleaseDate(),
                 film.getDuration(),
                 film.getMpa().getId(),
+                film.getRating(),
                 film.getId());
 
         insertGenresBatch(film.getId(), film.getGenres());
@@ -122,7 +124,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     public Film findById(long id) {
         try {
             Film film = jdbc.queryForObject(FIND_FILM_BY_ID, rowMapper, id);
-            if(film == null){
+            if (film == null) {
                 throw new NotFoundException("Фильм не найден");
             }
             getLikesAndGenresByFilmId(List.of(film));
@@ -141,9 +143,10 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     //Добавить лайк фильму
     public Film likeFilm(long id, long userId) {
         Film film = findById(id);
-        int row = jdbc.update(ADD_RATING_FILM, id, userId,10);
+        int row = jdbc.update(ADD_RATING_FILM, id, userId, 10);
 
         if (row > 0) {
+            getLikesAndGenresByFilmId(List.of(film));
             addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.ADD, id);
             return film;
         } else {
@@ -164,7 +167,13 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
 
     //Получить count популярных фильмов по указанным жанру и году
     public Collection<Film> getPopularFilmsByGenreIdByYear(int count, Integer genreId, Integer year) {
-        List<Film> popularFilm = jdbc.query(FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR, rowMapper, genreId, genreId, year, year, count);
+        List<Film> popularFilm = jdbc.query(
+                FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR,
+                rowMapper,
+                genreId,
+                year,
+                count
+        );
 
         getLikesAndGenresByFilmId(popularFilm);
         return popularFilm;
@@ -371,7 +380,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         findById(filmId);
         userDbStorage.findById(userId);
 
-        jdbc.update(ADD_RATING_FILM,filmId,userId,rating);
+        jdbc.update(ADD_RATING_FILM, filmId, userId, rating);
     }
 
     public void insertDirectorsBatch(long filmId, Set<Director> directors) {
@@ -405,6 +414,14 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
             if (count == null || count == 0) {
                 throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
             }
+        }
+    }
+
+
+    public void deleteFilm(long id) {
+        int row = jdbc.update(DELETE_FILM, id);
+        if (row <= 0) {
+            throw new NotFoundException("Не удалось удалить фильм с id " + id);
         }
     }
 }

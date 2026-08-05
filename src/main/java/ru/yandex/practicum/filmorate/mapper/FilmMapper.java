@@ -42,7 +42,9 @@ public class FilmMapper {
             film.setMpa(new MpaRating());
         }
         film.setGenres(request.getGenres());
-        //film.setLikes(new HashSet<Long>());
+        if(request.getRating() != null){
+            film.setRating(request.getRating());
+        }
         if (request.getDirectors() != null) {
             film.setDirectors(request.getDirectors());
         } else {

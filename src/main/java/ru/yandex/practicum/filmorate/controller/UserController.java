@@ -57,6 +57,11 @@ public class UserController {
         return user;
     }
 
+    @DeleteMapping("/{id}")
+    public  void deleteUser(@PathVariable long id) {
+        userService.deleteUser(id);
+    }
+
     //Добавить друга
     @PutMapping("/{id}/friends/{friendId}")
     public UserDto addFriend(@PathVariable long id, @PathVariable long friendId) {

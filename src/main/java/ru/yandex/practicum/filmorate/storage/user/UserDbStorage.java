@@ -130,4 +130,12 @@ public class UserDbStorage implements UserStorage {
     public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
         jdbc.update(INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
     }
+
+
+    public void deleteUser(long id) {
+        int row = jdbc.update(DELETE_USER,id);
+        if(row <= 0){
+            throw new NotFoundException("Не удалось удалить пользователя с id = " + id);
+        }
+    }
 }

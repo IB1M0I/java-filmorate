@@ -33,6 +33,10 @@ public class UserSql {
     //SQL-запрос для удаления друга
     static final String DELETE_FRIEND = "DELETE FROM friendships WHERE user_id = ? AND friend_id = ?";
 
+    //SQL-запрос для удаления пользователя
+    static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
+
+
     //SQL-запрос для получения общих друзей двух пользователей
     static final String COMMON_FRIEND = """
             SELECT u.*

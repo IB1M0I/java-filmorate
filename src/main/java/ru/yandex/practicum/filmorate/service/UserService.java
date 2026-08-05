@@ -140,4 +140,9 @@ public class UserService {
 
         return userStorage.getEventsUser(id);
     }
+
+
+    public void deleteUser(long id) {
+        userStorage.deleteUser(id);
+    }
 }
