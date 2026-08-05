@@ -373,7 +373,6 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         }, userId, friendId);
         getLikesAndGenresByFilmId(films);
         return films;
-
     }
 
     public void insertDirectorsBatch(long filmId, Set<Director> directors) {

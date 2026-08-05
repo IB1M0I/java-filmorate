@@ -5,4 +5,6 @@ import java.util.Collection;
 
 public interface FilmDirectorStorage {
     Collection<Film> getFilmsByDirectorSorted(long directorId, String sortBy);
+
+    Collection<Film> getCommonFilms(long userId, long friendId);
 }

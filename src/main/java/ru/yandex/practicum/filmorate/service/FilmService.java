@@ -174,4 +174,15 @@ public class FilmService {
         filmStorage.deleteFilm(id);
         log.info("Фильм с id {} успешно удален", id);
     }
+
+    public Collection<FilmDto> getCommonFilms(long userId, long friendId) {
+        // Проверяем существование пользователей
+        userStorage.findById(userId);
+        userStorage.findById(friendId);
+
+        return filmStorage.getCommonFilms(userId, friendId)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
 }

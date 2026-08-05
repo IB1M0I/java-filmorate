@@ -19,4 +19,5 @@ public interface FilmStorage {
     void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId);
 
     void deleteFilm(long id);
+
 }

@@ -137,4 +137,15 @@ public class FilmController {
         log.info("Фильм с id {} успешно удален", id);
     }
 
+    @GetMapping("/common")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<FilmDto> getCommonFilms(
+            @RequestParam long userId,
+            @RequestParam long friendId) {
+        log.debug("Получен запрос на получение общих фильмов пользователей {} и {}", userId, friendId);
+        Collection<FilmDto> films = filmService.getCommonFilms(userId, friendId);
+        log.info("Получено {} общих фильмов", films.size());
+        return films;
+    }
+
 }
