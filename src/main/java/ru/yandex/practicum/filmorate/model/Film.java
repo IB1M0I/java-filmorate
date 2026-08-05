@@ -32,11 +32,14 @@ public class Film {
     @Positive(message = "Длительность фильма не может быть 0")
     private Integer duration; //Продолжительность фильма
 
+    @Builder.Default
     private LinkedHashSet<Genre> genres = new LinkedHashSet<>(); //Жанры
 
     private MpaRating mpa; //MPA рейтинг
 
+    @Builder.Default
     private Set<Long> likes = new HashSet<>(); //Лайки
 
+    @Builder.Default
     private Set<Director> directors = new HashSet<>();
 }
