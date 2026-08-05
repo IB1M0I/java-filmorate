@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(force = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @EqualsAndHashCode
+@ToString
 public class MpaRating {
     private int id;
 
@@ -18,12 +20,10 @@ public class MpaRating {
 
     public MpaRating(int id) {
         this.id = id;
-
     }
 
     public MpaRating(int id, String name) {
         this.id = id;
         this.name = name;
     }
-
 }

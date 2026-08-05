@@ -80,7 +80,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         } else {
             throw new RuntimeException("Не удалось сохранить фильм и получить id");
         }
-        return film;
+        return findById(film.getId());
 
     }
 
@@ -121,7 +121,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
             insertDirectorsBatch(film.getId(), film.getDirectors());
         }
 
-        return film;
+        return findById(film.getId());
     }
 
 
@@ -299,6 +299,13 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
                 film.getDirectors().add(director);
             }
         }, filmIds);
+
+        System.out.println("После загрузки:");
+        for (Film film : filmMap.values()) {
+            System.out.println("Film id = " + film.getId());
+            System.out.println("MPA = " + film.getMpa());
+            System.out.println("Genres = " + film.getGenres());
+        }
 
         return filmMap.values();
     }
