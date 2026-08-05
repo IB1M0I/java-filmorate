@@ -7,11 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.mapper.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
 
@@ -198,5 +202,91 @@ public class UserDbStorageTest {
         Assertions.assertThat(userDbStorage.getFriends(saveUser.getId())).hasSize(1);
         userDbStorage.deleteFriend(saveUser.getId(), saveFriend.getId());
         Assertions.assertThat(userDbStorage.getFriends(saveUser.getId())).hasSize(0);
+    }
+
+    //Тест добавления события
+    @Test
+    public void testAddEvent_WhenEventAdded_EventReturned() {
+        User user = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+
+        User user2 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+
+        User saveUser = userDbStorage.addUser(user);
+        User saveUser2 = userDbStorage.addUser(user2);
+        long timestamp = Instant.now().toEpochMilli();
+        long userId = saveUser.getId();
+
+
+        userDbStorage.addEvent(timestamp, userId, EventType.FRIEND, Operation.ADD, saveUser2.getId());
+
+        Collection<Event> events = userDbStorage.getEventsUser(userId);
+        Assertions.assertThat(events).isNotNull();
+        Assertions.assertThat(events).hasSize(1);
+
+        Event event = events.iterator().next();
+        Assertions.assertThat(event.getTimestamp()).isEqualTo(timestamp);
+        Assertions.assertThat(event.getUserId()).isEqualTo(userId);
+        Assertions.assertThat(event.getEventType()).isEqualTo(EventType.FRIEND);
+        Assertions.assertThat(event.getOperation()).isEqualTo(Operation.ADD);
+        Assertions.assertThat(event.getEntityId()).isEqualTo(saveUser2.getId());
+    }
+
+    //Тест получения событий пользователя
+    @Test
+    public void testGetEventsUser_WhenEventsExist_EventsReturned() {
+        User user = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+
+        User user2 = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+
+
+        User saveUser = userDbStorage.addUser(user);
+        User saveUser2 = userDbStorage.addUser(user2);
+
+        long userId = saveUser.getId();
+
+        userDbStorage.addEvent(Instant.now().toEpochMilli(), userId, EventType.FRIEND, Operation.ADD, saveUser2.getId());
+
+
+        Collection<Event> events = userDbStorage.getEventsUser(userId);
+        Assertions.assertThat(events).isNotNull();
+        Assertions.assertThat(events).hasSize(1);
+    }
+
+    //Тест получения событий когда их нет
+    @Test
+    public void testGetEventsUser_WhenNoEvents_EmptyListReturned() {
+        User user = User.builder()
+                .name("Имя")
+                .login("login")
+                .email("email@mail.com")
+                .birthday(LocalDate.now())
+                .build();
+
+
+        User saveUser = userDbStorage.addUser(user);
+
+        Collection<Event> events = userDbStorage.getEventsUser(saveUser.getId());
+        Assertions.assertThat(events).isNotNull();
+        Assertions.assertThat(events).isEmpty();
     }
 }

@@ -27,4 +27,6 @@ public class Review {
 
     @Builder.Default
     private Integer useful = 0;
+
+
 }
