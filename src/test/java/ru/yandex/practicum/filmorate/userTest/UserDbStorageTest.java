@@ -45,7 +45,7 @@ public class UserDbStorageTest {
     void setUp() {
         jdbc.execute("SET REFERENTIAL_INTEGRITY FALSE");
 
-        jdbc.execute("DELETE FROM rating_movies");
+        jdbc.execute("DELETE FROM likes_movies");
         jdbc.execute("DELETE FROM films");
         jdbc.execute("DELETE FROM users");
 
