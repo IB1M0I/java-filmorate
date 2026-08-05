@@ -88,22 +88,32 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     //Обновить информацию о фильме в базе данных
     @Override
     public Film updateFilm(Film film) {
+        Film existingFilm = findById(film.getId()); // Если фильма нет - выбросит NotFoundException
+
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата выпуска фильма не может быть раньше 28 декабря 1895 года");
         }
 
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            validateDirectors(film.getDirectors());  // Вызов нового приватного метода
+            validateDirectors(film.getDirectors());
         }
 
+        // Удаляем старые связи
         jdbc.update("DELETE FROM movie_genres WHERE film_id = ?", film.getId());
         jdbc.update("DELETE FROM film_directors WHERE film_id = ?", film.getId());
-        jdbc.update(UPDATE_FILM, film.getName(),
+
+        // Обновляем фильм
+        int updatedRows = jdbc.update(UPDATE_FILM, film.getName(),
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),
                 film.getMpa().getId(),
                 film.getId());
+
+        // Проверяем, что обновление произошло
+        if (updatedRows == 0) {
+            throw new NotFoundException("Фильм с id=" + film.getId() + " не найден");
+        }
 
         insertGenresBatch(film.getId(), film.getGenres());
 
