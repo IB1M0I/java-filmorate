@@ -136,4 +136,13 @@ public class UserDbStorage implements UserStorage {
     public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
         jdbc.update(INSERT_USER_EVENT, timestamp, userId, eventType.name(), operation.name(), entityId);
     }
+
+    @Override
+    public void deleteUser(long id) {
+        findById(id);
+        int rowsDeleted = jdbc.update("DELETE FROM users WHERE id = ?", id);
+        if (rowsDeleted == 0) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
+    }
 }

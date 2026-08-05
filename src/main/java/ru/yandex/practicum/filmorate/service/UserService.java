@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -17,6 +18,7 @@ import ru.yandex.practicum.filmorate.storage.user.dto.UserDto;
 
 import java.util.Collection;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -138,5 +140,11 @@ public class UserService {
     public Collection<Event> getEventsUser(long id) {
 
         return userStorage.getEventsUser(id);
+    }
+
+    public void deleteUser(long id) {
+        log.debug("Удаление пользователя с id: {}", id);
+        userStorage.deleteUser(id);
+        log.info("Пользователь с id {} успешно удален", id);
     }
 }

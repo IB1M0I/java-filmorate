@@ -129,4 +129,12 @@ public class FilmController {
         return filmsByTitleByDirector;
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFilm(@PathVariable long id) {
+        log.debug("Получен запрос на удаление фильма с id: {}", id);
+        filmService.deleteFilm(id);
+        log.info("Фильм с id {} успешно удален", id);
+    }
+
 }

@@ -168,4 +168,10 @@ public class FilmService {
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
+
+    public void deleteFilm(long id) {
+        log.debug("Удаление фильма с id: {}", id);
+        filmStorage.deleteFilm(id);
+        log.info("Фильм с id {} успешно удален", id);
+    }
 }

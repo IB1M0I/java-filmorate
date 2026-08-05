@@ -415,4 +415,27 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
                 jdbc.query(FIND_FILMS_BY_TITLE_BY_DIRECTOR, rowMapper, title, query, director, query)
         );
     }
+
+    @Override
+    public void deleteFilm(long id) {
+        findById(id);
+
+        //Сначала удаляем связи с жанрами
+        jdbc.update("DELETE FROM movie_genres WHERE film_id = ?", id);
+
+        //Удаляем связи с режиссерами
+        jdbc.update("DELETE FROM film_directors WHERE film_id = ?", id);
+
+        //Удаляем лайки
+        jdbc.update("DELETE FROM likes_movies WHERE film_id = ?", id);
+
+        //Удаляем отзывы (если есть)
+        jdbc.update("DELETE FROM reviews WHERE film_id = ?", id);
+
+        //удаляем сам фильм
+        int rowsDeleted = jdbc.update("DELETE FROM films WHERE id = ?", id);
+        if (rowsDeleted == 0) {
+            throw new NotFoundException("Фильм с id = " + id + " не найден");
+        }
+    }
 }
