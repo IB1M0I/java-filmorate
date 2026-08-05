@@ -125,7 +125,7 @@ public class FilmController {
     ) {
         log.debug("Получен запрос на поиск по названию фильмов и по режиссёру {}: {}", by, query);
         Collection<FilmDto> filmsByTitleByDirector = filmService.searchFilmsByTitleByDirector(query, by);
-        log.info("Получено {} фильмов по названию и по режиссёру {}", filmsByTitleByDirector.size(), query);
+        log.info("Получено {} фильмов по названию и по режиссёру {}: {}", filmsByTitleByDirector.size(), by, query);
         return filmsByTitleByDirector;
     }
 
