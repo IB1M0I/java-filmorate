@@ -5,6 +5,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
@@ -94,25 +95,12 @@ public class UserService {
     //Удалить друга
     public UserDto deleteFriend(long id, long friendId) {
 
-
-//        try {
-//            userStorage.findById(id);
-//        } catch (EmptyResultDataAccessException e) {
-//            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
-//        }
-//        try {
-//            userStorage.findById(friendId);
-//        } catch (EmptyResultDataAccessException e) {
-//            throw new NotFoundException(String.format("Друг с id = %d не найден", friendId));
-//        }
-
         userStorage.findById(id);
         userStorage.findById(friendId);
 
         User friend = userStorage.findById(friendId);
 
         userStorage.deleteFriend(id, friendId);
-//        userStorage.updateFriendshipIsConfirmed(friendId, id, false);
 
         return UserMapper.mapToUserDto(friend);
     }
@@ -145,7 +133,7 @@ public class UserService {
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
-}
+
     //Получить события пользователя
     public Collection<Event> getEventsUser(long id) {
 

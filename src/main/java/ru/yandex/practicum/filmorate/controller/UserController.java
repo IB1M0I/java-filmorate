@@ -106,10 +106,12 @@ public class UserController {
         Collection<FilmDto> recommendations = userService.getRecommendations(id);
         log.info("Получено {} рекомендованных фильмов для пользователя с id = {}", recommendations.size(), id);
         return recommendations;
+
+    }
+
     //Получить события пользователя по id
     @GetMapping("/{id}/feed")
     public Collection<Event> getEventsUser(@PathVariable long id) {
         return userService.getEventsUser(id);
     }
-
 }

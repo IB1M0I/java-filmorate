@@ -123,6 +123,8 @@ public class UserDbStorage implements UserStorage {
 
     public Collection<Film> getRecommendations(long id) {
         return jdbc.query(GET_RECOMMENDATIONS, filmRowMapper, id, id);
+    }
+
     //Получить события пользователя
     public Collection<Event> getEventsUser(long id) {
         findById(id);
