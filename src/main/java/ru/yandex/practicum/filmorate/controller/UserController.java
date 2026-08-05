@@ -1,11 +1,15 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.user.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.storage.user.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.storage.user.dto.UserDto;
@@ -16,6 +20,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -99,10 +104,19 @@ public class UserController {
         return commonFriends;
     }
 
+    // Получить рекомендации по фильмам
+    @GetMapping("/{id}/recommendations")
+    public Collection<FilmDto> getRecommendations(@PathVariable @NotNull @Positive Long id) {
+        log.debug("Получен запрос на получение рекомендаций по фильмам для пользователя с id = {}", id);
+        Collection<FilmDto> recommendations = userService.getRecommendations(id);
+        log.info("Получено {} рекомендованных фильмов для пользователя с id = {}", recommendations.size(), id);
+        return recommendations;
+
+    }
+
     //Получить события пользователя по id
     @GetMapping("/{id}/feed")
     public Collection<Event> getEventsUser(@PathVariable long id) {
         return userService.getEventsUser(id);
     }
-
 }

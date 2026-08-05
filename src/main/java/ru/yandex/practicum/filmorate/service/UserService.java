@@ -5,9 +5,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.storage.user.dto.UpdateUserRequest;
@@ -93,25 +95,12 @@ public class UserService {
     //Удалить друга
     public UserDto deleteFriend(long id, long friendId) {
 
-
-//        try {
-//            userStorage.findById(id);
-//        } catch (EmptyResultDataAccessException e) {
-//            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
-//        }
-//        try {
-//            userStorage.findById(friendId);
-//        } catch (EmptyResultDataAccessException e) {
-//            throw new NotFoundException(String.format("Друг с id = %d не найден", friendId));
-//        }
-
         userStorage.findById(id);
         userStorage.findById(friendId);
 
         User friend = userStorage.findById(friendId);
 
         userStorage.deleteFriend(id, friendId);
-//        userStorage.updateFriendshipIsConfirmed(friendId, id, false);
 
         return UserMapper.mapToUserDto(friend);
     }
@@ -132,6 +121,16 @@ public class UserService {
 
         return userStorage.getCommonFriends(id, otherId).stream()
                 .map(UserMapper::mapToUserDto)
+                .toList();
+    }
+
+    public Collection<FilmDto> getRecommendations(long id) {
+        // проверка существования пользователя
+        userStorage.findById(id);
+
+        return userStorage.getRecommendations(id)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
 

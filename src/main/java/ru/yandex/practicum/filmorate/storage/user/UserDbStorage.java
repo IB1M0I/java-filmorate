@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Operation;
@@ -29,6 +30,7 @@ import static ru.yandex.practicum.filmorate.storage.user.UserSql.*;
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbc;
     private final RowMapper<User> rowMapper;
+    private final RowMapper<Film> filmRowMapper;
 
 
     //Добавить пользователя в базу данных
@@ -117,6 +119,10 @@ public class UserDbStorage implements UserStorage {
     //Получить список общих друзей двух пользователей
     public Collection<User> getCommonFriends(long id, long otherId) {
         return jdbc.query(COMMON_FRIEND, rowMapper, id, otherId);
+    }
+
+    public Collection<Film> getRecommendations(long id) {
+        return jdbc.query(GET_RECOMMENDATIONS, filmRowMapper, id, id);
     }
 
     //Получить события пользователя
