@@ -14,6 +14,8 @@ import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.mapper.EventRowMapper;
 
 import java.sql.Date;
@@ -30,6 +32,7 @@ import static ru.yandex.practicum.filmorate.storage.user.UserSql.*;
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbc;
     private final RowMapper<User> rowMapper;
+    private final FilmDbStorage filmStorage;
     private final RowMapper<Film> filmRowMapper;
 
 
@@ -122,7 +125,9 @@ public class UserDbStorage implements UserStorage {
     }
 
     public Collection<Film> getRecommendations(long id) {
-        return jdbc.query(GET_RECOMMENDATIONS, filmRowMapper, id, id);
+        Collection<Film> films =  jdbc.query(GET_RECOMMENDATIONS, filmRowMapper, id, id);
+        filmStorage.getLikesAndGenresByFilmId(films);
+        return films;
     }
 
     //Получить события пользователя
