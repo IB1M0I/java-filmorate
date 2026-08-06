@@ -7,6 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/*
+    Сущность рейтинга MPA.
+    Содержит информацию о возрастном рейтинге фильма.
+ */
 @Getter
 @NoArgsConstructor(force = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)

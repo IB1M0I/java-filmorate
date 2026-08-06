@@ -113,7 +113,10 @@ public class UserController {
     //Получить события пользователя по id
     @GetMapping("/{id}/feed")
     public Collection<Event> getEventsUser(@PathVariable long id) {
-        return userService.getEventsUser(id);
+        log.debug("Получен запрос на получение событий пользователя с id: {}", id);
+        Collection<Event> events = userService.getEventsUser(id);
+        log.info("Получено {} событий пользователя с id: {}", events.size(), id);
+        return events;
     }
 
     @DeleteMapping("/{id}")

@@ -138,8 +138,10 @@ public class UserService {
 
     //Получить события пользователя
     public Collection<Event> getEventsUser(long id) {
-
-        return userStorage.getEventsUser(id);
+        log.debug("Получение событий пользователя с id: {}", id);
+        Collection<Event> events = userStorage.getEventsUser(id);
+        log.info("Получено {} событий пользователя с id: {}", events.size(), id);
+        return events;
     }
 
     public void deleteUser(long id) {

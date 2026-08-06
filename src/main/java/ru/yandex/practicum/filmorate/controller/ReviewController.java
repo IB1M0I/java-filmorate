@@ -20,6 +20,7 @@ import java.util.Collection;
 public class ReviewController {
     private final ReviewService reviewService;
 
+    //Добавить отзыв на фильм
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReviewDto addReview(@Valid @RequestBody NewReviewRequest request) {
@@ -29,6 +30,7 @@ public class ReviewController {
         return review;
     }
 
+    //Обновить отзыв
     @PutMapping
     public ReviewDto updateReview(@Valid @RequestBody UpdateReviewRequest request) {
         log.debug("Получен запрос на обновление отзыва с id: {}", request.getReviewId());
@@ -37,6 +39,7 @@ public class ReviewController {
         return review;
     }
 
+    //Удалить отзыв
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReview(@PathVariable long id) {
@@ -45,6 +48,7 @@ public class ReviewController {
         log.info("Отзыв с id {} успешно удален", id);
     }
 
+    //Получить отзыв по id
     @GetMapping("/{id}")
     public ReviewDto findById(@PathVariable long id) {
         log.debug("Получен запрос на получение отзыва с id: {}", id);
@@ -53,6 +57,7 @@ public class ReviewController {
         return review;
     }
 
+    //Получить список отзывов
     @GetMapping
     public Collection<ReviewDto> findAll(
             @RequestParam(required = false) Long filmId,
@@ -63,6 +68,7 @@ public class ReviewController {
         return reviews;
     }
 
+    //Поставить лайк отзыву
     @PutMapping("/{id}/like/{userId}")
     public ReviewDto addLike(
             @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
@@ -73,6 +79,7 @@ public class ReviewController {
         return review;
     }
 
+    //Поставить дизлайк отзыву
     @PutMapping("/{id}/dislike/{userId}")
     public ReviewDto addDislike(
             @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
@@ -83,6 +90,7 @@ public class ReviewController {
         return review;
     }
 
+    //Удалить лайк с отзыва
     @DeleteMapping("/{id}/like/{userId}")
     public ReviewDto deleteLike(
             @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
@@ -93,6 +101,7 @@ public class ReviewController {
         return review;
     }
 
+    //Удалить дизлайк с отзыва
     @DeleteMapping("/{id}/dislike/{userId}")
     public ReviewDto deleteDislike(
             @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,

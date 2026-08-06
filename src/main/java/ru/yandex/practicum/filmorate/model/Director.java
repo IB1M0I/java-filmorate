@@ -5,6 +5,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/*
+    Сущность режиссера.
+    Содержит информацию о режиссере фильмов.
+ */
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")

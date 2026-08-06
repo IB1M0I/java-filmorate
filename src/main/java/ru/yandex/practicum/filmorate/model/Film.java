@@ -14,6 +14,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 
+/*
+    Сущность фильма.
+    Содержит информацию о фильме: название, описание, дата выхода, длительность,
+    жанры, MPA рейтинг, лайки и режиссеры.
+ */
 @Data
 @Builder
 @NoArgsConstructor
