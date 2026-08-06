@@ -74,7 +74,6 @@ public class UserService {
 
         if (userStorage.getFriends(friendId).stream()
                 .anyMatch(user -> user.getId() == id)) {
-            //userStorage.updateFriendshipIsConfirmed(friendId, id, true);
             return UserMapper.mapToUserDto(userStorage.addFriend(id, friendId, true));
         } else {
             return UserMapper.mapToUserDto(userStorage.addFriend(id, friendId, false));
