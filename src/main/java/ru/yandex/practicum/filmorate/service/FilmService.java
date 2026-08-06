@@ -168,4 +168,21 @@ public class FilmService {
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
+
+    public void deleteFilm(long id) {
+        log.debug("Удаление фильма с id: {}", id);
+        filmStorage.deleteFilm(id);
+        log.info("Фильм с id {} успешно удален", id);
+    }
+
+    public Collection<FilmDto> getCommonFilms(long userId, long friendId) {
+        // Проверяем существование пользователей
+        userStorage.findById(userId);
+        userStorage.findById(friendId);
+
+        return filmStorage.getCommonFilms(userId, friendId)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
 }

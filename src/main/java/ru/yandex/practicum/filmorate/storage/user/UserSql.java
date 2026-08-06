@@ -42,25 +42,26 @@ public class UserSql {
             ) AND u.id IN (
             \tSELECT friend_id FROM friendships WHERE user_id = ?
             )""";
+
     static final String GET_RECOMMENDATIONS = """
-            SELECT f.*
-            FROM likes_movies lm
-            JOIN films f ON lm.film_id = f.id
-            WHERE lm.user_id IN (
-                SELECT lm2.user_id
-                FROM likes_movies lm1
-                JOIN likes_movies lm2 ON lm1.film_id = lm2.film_id AND lm1.user_id <> lm2.user_id
-                WHERE lm1.user_id = ?
-                GROUP BY lm2.user_id
-                ORDER BY COUNT(*) DESC
-            )
-            AND lm.film_id NOT IN (
-                SELECT film_id
-                FROM likes_movies
-                WHERE user_id = ?
-            )
-            GROUP BY f.id
-            ORDER BY COUNT(DISTINCT lm.user_id) DESC""";
+        SELECT DISTINCT f.*
+        FROM likes_movies lm_rec
+        JOIN films f ON lm_rec.film_id = f.id
+        WHERE lm_rec.user_id = (
+            SELECT lm2.user_id
+            FROM likes_movies lm1
+            JOIN likes_movies lm2 ON lm1.film_id = lm2.film_id AND lm1.user_id <> lm2.user_id
+            WHERE lm1.user_id = ?
+            GROUP BY lm2.user_id
+            ORDER BY COUNT(lm1.film_id) DESC
+            LIMIT 1
+        )
+        AND lm_rec.film_id NOT IN (
+            SELECT film_id
+            FROM likes_movies
+            WHERE user_id = ?
+        )
+        """;
 
     //SQL-запрос для получения событий пользователя по id
     static final String FIND_USER_EVENT_ID = """

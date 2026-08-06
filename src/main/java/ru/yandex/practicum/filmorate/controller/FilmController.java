@@ -129,4 +129,23 @@ public class FilmController {
         return filmsByTitleByDirector;
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFilm(@PathVariable long id) {
+        log.debug("Получен запрос на удаление фильма с id: {}", id);
+        filmService.deleteFilm(id);
+        log.info("Фильм с id {} успешно удален", id);
+    }
+
+    @GetMapping("/common")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<FilmDto> getCommonFilms(
+            @RequestParam long userId,
+            @RequestParam long friendId) {
+        log.debug("Получен запрос на получение общих фильмов пользователей {} и {}", userId, friendId);
+        Collection<FilmDto> films = filmService.getCommonFilms(userId, friendId);
+        log.info("Получено {} общих фильмов", films.size());
+        return films;
+    }
+
 }

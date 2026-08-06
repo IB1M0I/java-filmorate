@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
@@ -113,5 +114,13 @@ public class UserController {
     @GetMapping("/{id}/feed")
     public Collection<Event> getEventsUser(@PathVariable long id) {
         return userService.getEventsUser(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable long id) {
+        log.debug("Получен запрос на удаление пользователя с id: {}", id);
+        userService.deleteUser(id);
+        log.info("Пользователь с id {} успешно удален", id);
     }
 }
