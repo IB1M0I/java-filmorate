@@ -31,16 +31,16 @@ public class FilmSql {
     static final String DELETE_LIKE = "DELETE FROM likes_movies WHERE film_id = ? AND user_id = ?";
     //SQL-запрос для получения count популярных фильмов по указанным жанру и году
     static final String FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR = """
-        SELECT f.*
-        FROM films f
-        LEFT JOIN movie_genres mg ON f.id = mg.film_id
-        LEFT JOIN likes_movies lm ON f.id = lm.film_id
-        WHERE (? IS NULL OR mg.genre_id = ?) 
-          AND (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?)
-        GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
-        ORDER BY COUNT(lm.user_id) DESC
-        LIMIT ?
-        """;
+            SELECT f.*
+            FROM films f
+            LEFT JOIN movie_genres mg ON f.id = mg.film_id
+            LEFT JOIN likes_movies lm ON f.id = lm.film_id
+            WHERE (? IS NULL OR mg.genre_id = ?)
+            AND (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?)
+            GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
+            ORDER BY COUNT(lm.user_id) DESC
+            LIMIT ?
+            """;
 
     //SQL-запрос для проверки существования рейтинга MPA
     static final String CHECK_MPA_ID = "SELECT COUNT(*) FROM mpa_rating WHERE id = ?";
