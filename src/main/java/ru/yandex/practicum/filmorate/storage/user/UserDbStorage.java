@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,7 +21,7 @@ import java.util.Collection;
 
 import static ru.yandex.practicum.filmorate.storage.user.UserSql.*;
 
-@RequiredArgsConstructor
+
 @Repository
 @Primary
 @Slf4j
@@ -29,6 +30,13 @@ public class UserDbStorage implements UserStorage {
     private final RowMapper<User> rowMapper;
     private final FilmDbStorage filmStorage;
     private final RowMapper<Film> filmRowMapper;
+
+    public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> rowMapper, @Lazy FilmDbStorage filmStorage, RowMapper<Film> filmRowMapper) {
+        this.jdbc = jdbc;
+        this.rowMapper = rowMapper;
+        this.filmStorage = filmStorage;
+        this.filmRowMapper = filmRowMapper;
+    }
 
 
     //Добавить пользователя в базу данных

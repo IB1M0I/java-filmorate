@@ -150,7 +150,7 @@ public class FilmController {
 
     //Поставить оценку фильму
     @PutMapping("{filmId}/like/{userId}/{rating}")
-    public void addRatingFilm(@PathVariable long filmId, @PathVariable long userId, @PathVariable int rating) {
+    public void addRatingFilm(@PathVariable long filmId, @PathVariable long userId, @PathVariable double rating) {
         log.debug("Пользователь {} ставит оценку {} фильму с id: {}", userId, rating, filmId);
         filmService.addRatingFilm(filmId,userId,rating);
 

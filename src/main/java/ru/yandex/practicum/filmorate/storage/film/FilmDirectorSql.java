@@ -22,19 +22,12 @@ public class FilmDirectorSql {
                     "WHERE fd.director_id = ? " +
                     "ORDER BY f.release_date ASC";
 
-        public static final String FIND_FILMS_BY_DIRECTOR_SORT_BY_LIKES =
-            "SELECT f.*, COUNT(lm.user_id) as like_count FROM films f " +
+    public static final String FIND_FILMS_BY_DIRECTOR_SORT_BY_RATING =
+            "SELECT f.*, COALESCE(AVG(rm.rating), 0) as avg_rating FROM films f " +
                     "JOIN film_directors fd ON f.id = fd.film_id " +
-                    "LEFT JOIN likes_movies lm ON f.id = lm.film_id " +
+                    "LEFT JOIN rating_movies rm ON f.id = rm.film_id " +
                     "WHERE fd.director_id = ? " +
                     "GROUP BY f.id " +
-                    "ORDER BY like_count DESC";
-//    public static final String FIND_FILMS_BY_DIRECTOR_SORT_BY_LIKES = """
-//            SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id,
-//            	COALESCE(AVG(rm.rating), 0.0) AS rating
-//            FROM films AS f
-//            JOIN RATING_MOVIES AS rm ON f.id = rm.film_id
-//            GROUP BY f.id
-//            ORDER BY rating DESC, f.id ASC
-//            """;
+                    "ORDER BY avg_rating DESC";
+
 }

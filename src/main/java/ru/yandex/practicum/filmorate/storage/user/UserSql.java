@@ -49,19 +49,19 @@ public class UserSql {
 
     static final String GET_RECOMMENDATIONS = """
         SELECT f.*
-        FROM likes_movies lm
+        FROM rating_movies lm
         JOIN films f ON lm.film_id = f.id
         WHERE lm.user_id IN (
             SELECT lm2.user_id
-            FROM likes_movies lm1
-            JOIN likes_movies lm2 ON lm1.film_id = lm2.film_id AND lm1.user_id <> lm2.user_id
+            FROM rating_movies lm1
+            JOIN rating_movies lm2 ON lm1.film_id = lm2.film_id AND lm1.user_id <> lm2.user_id
             WHERE lm1.user_id = ?
             GROUP BY lm2.user_id
             ORDER BY COUNT(*) DESC
         )
         AND lm.film_id NOT IN (
             SELECT film_id
-            FROM likes_movies
+            FROM rating_movies
             WHERE user_id = ?
         )
         GROUP BY f.id

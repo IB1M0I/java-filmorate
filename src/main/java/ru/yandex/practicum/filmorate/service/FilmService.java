@@ -186,7 +186,7 @@ public class FilmService {
                 .toList();
     }
 
-    public void addRatingFilm(long filmId, long userId, int rating) {
+    public void addRatingFilm(long filmId, long userId, double rating) {
         filmStorage.addRatingFilm(filmId,userId,rating);
     }
 

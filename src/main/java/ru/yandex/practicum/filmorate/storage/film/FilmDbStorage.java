@@ -218,8 +218,8 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         String sql;
         if ("year".equals(sortBy)) {
             sql = FIND_FILMS_BY_DIRECTOR_SORT_BY_YEAR;
-        } else if ("likes".equals(sortBy)) {
-            sql = FIND_FILMS_BY_DIRECTOR_SORT_BY_LIKES;
+        } else if ("rate".equals(sortBy)) {
+            sql = FIND_FILMS_BY_DIRECTOR_SORT_BY_RATING;
         } else {
             throw new ValidationException("Неверный параметр сортировки: " + sortBy);
         }
@@ -403,7 +403,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         return films;
     }
 
-    public void addRatingFilm(long filmId, long userId, int rating) {
+    public void addRatingFilm(long filmId, long userId, double rating) {
         findById(filmId);
         userDbStorage.findById(userId);
 
@@ -465,7 +465,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         jdbc.update("DELETE FROM film_directors WHERE film_id = ?", id);
 
         //Удаляем лайки
-        jdbc.update("DELETE FROM likes_movies WHERE film_id = ?", id);
+        jdbc.update("DELETE FROM rating_movies WHERE film_id = ?", id);
 
         //Удаляем отзывы (если есть)
         jdbc.update("DELETE FROM reviews WHERE film_id = ?", id);
