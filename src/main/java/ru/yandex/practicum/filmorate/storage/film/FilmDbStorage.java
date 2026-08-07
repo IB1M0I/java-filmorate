@@ -97,7 +97,6 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     @Override
     public Film updateFilm(Film film) {
         log.debug("Обновление фильма с id: {}", film.getId());
-        Film existingFilm = findById(film.getId()); // Если фильма нет - выбросит NotFoundException
 
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата выпуска фильма не может быть раньше 28 декабря 1895 года");
@@ -481,10 +480,5 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     }
 
 
-    public void deleteFilm(long id) {
-        int row = jdbc.update(DELETE_FILM, id);
-        if (row <= 0) {
-            throw new NotFoundException("Не удалось удалить фильм с id " + id);
-        }
-    }
+
 }
