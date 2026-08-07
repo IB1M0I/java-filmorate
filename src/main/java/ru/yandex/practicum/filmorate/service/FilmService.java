@@ -25,6 +25,9 @@ import java.util.Collection;
 public class FilmService {
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
+    private static final String WARN_MESSAGE = "Некорректно задан параметр запроса by: {}";
+    private static final String DIRECTOR_QUERY_PARAM = "director";
+    private static final String TITLE_QUERY_PARAM = "title";
 
     //Добавить новый фильм
     public FilmDto addFilm(NewFilmRequest request) {
@@ -132,6 +135,52 @@ public class FilmService {
     //Получить фильмы режиссера с сортировкой
     public Collection<FilmDto> getFilmsByDirector(long directorId, String sortBy) {
         return filmStorage.getFilmsByDirectorSorted(directorId, sortBy)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
+
+    public Collection<FilmDto> searchFilmsByTitleByDirector(String query, String by) {
+        boolean title = false;
+        boolean director = false;
+
+        String[] queryParams = by.split(",");
+        switch (queryParams.length) {
+            case 1, 2:
+                for (String queryParam : queryParams) {
+                    switch (queryParam) {
+                        case TITLE_QUERY_PARAM:
+                            title = true;
+                            break;
+                        case DIRECTOR_QUERY_PARAM:
+                            director = true;
+                            break;
+                        default:
+                            log.warn(WARN_MESSAGE, by);
+                    }
+                }
+                break;
+            default:
+                log.warn(WARN_MESSAGE, by);
+        }
+        return filmStorage.searchFilmsByTitleByDirector(query, title, director)
+                .stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
+
+    public void deleteFilm(long id) {
+        log.debug("Удаление фильма с id: {}", id);
+        filmStorage.deleteFilm(id);
+        log.info("Фильм с id {} успешно удален", id);
+    }
+
+    public Collection<FilmDto> getCommonFilms(long userId, long friendId) {
+        // Проверяем существование пользователей
+        userStorage.findById(userId);
+        userStorage.findById(friendId);
+
+        return filmStorage.getCommonFilms(userId, friendId)
                 .stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();

@@ -358,13 +358,15 @@ public class UserDbStorageTest {
         userDbStorage.addUser(user3);
 
         filmDbStorage.likeFilm(film1.getId(), user1.getId());
+        filmDbStorage.likeFilm(film1.getId(), user2.getId());
         filmDbStorage.likeFilm(film2.getId(), user1.getId());
         filmDbStorage.likeFilm(film2.getId(), user2.getId());
         filmDbStorage.likeFilm(film2.getId(), user3.getId());
         filmDbStorage.likeFilm(film3.getId(), user1.getId());
+        filmDbStorage.likeFilm(film3.getId(), user2.getId());
         filmDbStorage.likeFilm(film3.getId(), user3.getId());
 
-        Collection<Film> recommendations = userDbStorage.getRecommendations(1);
+        Collection<Film> recommendations = userDbStorage.getRecommendations(user2.getId());
 
         assertThat(recommendations).isEmpty();
     }

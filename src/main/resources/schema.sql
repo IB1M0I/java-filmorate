@@ -1,3 +1,5 @@
+DROP ALL OBJECTS DELETE FILES;
+
 --Создание таблиц пользователей
 CREATE TABLE IF NOT EXISTS users
 (

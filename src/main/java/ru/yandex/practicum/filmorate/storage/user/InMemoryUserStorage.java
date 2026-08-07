@@ -74,20 +74,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     //Удалить пользователя
-    public User deleteUser(long id) {
-        log.trace("Вызван метод deleteUser");
-        log.debug("id = {}", id);
-
+    @Override
+    public void deleteUser(long id) {
         if (!users.containsKey(id)) {
-            log.error("Пользователь с id = {} не найден", id);
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
-
-        User user = users.get(id);
-
         users.remove(id);
         log.info("Пользователь с id = {} удален", id);
-        return user;
     }
 
     //Получить пользователя по id

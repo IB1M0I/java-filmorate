@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -23,6 +24,7 @@ import java.util.*;
 import static ru.yandex.practicum.filmorate.storage.film.FilmDirectorSql.*;
 import static ru.yandex.practicum.filmorate.storage.film.FilmSql.*;
 
+@Slf4j
 @Repository
 @Primary
 @RequiredArgsConstructor
@@ -34,6 +36,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     //Добавить фильм в базу данных
     @Override
     public Film addFilm(Film film) {
+        log.debug("Добавление фильма: {}", film.getName());
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата выпуска фильма не может быть раньше 28 декабря 1895 года");
         }
@@ -72,6 +75,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         Long id = keyHolder.getKeyAs(Long.class);
         if (id != null) {
             film.setId(id);
+            log.info("Фильм успешно добавлен с id: {}", id);
             if (film.getGenres() != null) {
                 insertGenresBatch(id, film.getGenres());
             } else {
@@ -81,9 +85,10 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
                 insertDirectorsBatch(film.getId(), film.getDirectors());
             }
         } else {
+            log.error("Не удалось сохранить фильм и получить id");
             throw new RuntimeException("Не удалось сохранить фильм и получить id");
         }
-        return film;
+        return findById(film.getId());
 
     }
 
@@ -91,17 +96,23 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     //Обновить информацию о фильме в базе данных
     @Override
     public Film updateFilm(Film film) {
+        log.debug("Обновление фильма с id: {}", film.getId());
+        Film existingFilm = findById(film.getId()); // Если фильма нет - выбросит NotFoundException
+
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата выпуска фильма не может быть раньше 28 декабря 1895 года");
         }
 
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            validateDirectors(film.getDirectors());  // Вызов нового приватного метода
+            validateDirectors(film.getDirectors());
         }
 
+        // Удаляем старые связи
         jdbc.update("DELETE FROM movie_genres WHERE film_id = ?", film.getId());
         jdbc.update("DELETE FROM film_directors WHERE film_id = ?", film.getId());
-        jdbc.update(UPDATE_FILM, film.getName(),
+
+        // Обновляем фильм
+        int updatedRows = jdbc.update(UPDATE_FILM, film.getName(),
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),
@@ -109,19 +120,27 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
                 film.getRating(),
                 film.getId());
 
+        // Проверяем, что обновление произошло
+        if (updatedRows == 0) {
+            log.error("Фильм с id={} не найден", film.getId());
+            throw new NotFoundException("Фильм с id=" + film.getId() + " не найден");
+        }
+        log.info("Фильм с id {} успешно обновлен", film.getId());
+
         insertGenresBatch(film.getId(), film.getGenres());
 
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
             insertDirectorsBatch(film.getId(), film.getDirectors());
         }
 
-        return film;
+        return findById(film.getId());
     }
 
 
     //Найти фильм по id
     @Override
     public Film findById(long id) {
+        log.debug("Поиск фильма с id: {}", id);
         try {
             Film film = jdbc.queryForObject(FIND_FILM_BY_ID, rowMapper, id);
             if (film == null) {
@@ -130,6 +149,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
             getLikesAndGenresByFilmId(List.of(film));
             return film;
         } catch (EmptyResultDataAccessException e) {
+            log.error("Фильм с id {} не найден", id);
             throw new NotFoundException("Фильм не найден");
         }
     }
@@ -137,50 +157,56 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
     //Получить список всех фильмов
     @Override
     public Collection<Film> findAll() {
-        return getLikesAndGenresByFilmId(jdbc.query(FIND_ALL_FILMS, rowMapper));
+        log.debug("Получение всех фильмов");
+        Collection<Film> films = getLikesAndGenresByFilmId(jdbc.query(FIND_ALL_FILMS, rowMapper));
+        log.info("Получено {} фильмов", films.size());
+        return films;
     }
 
     //Добавить лайк фильму
     public Film likeFilm(long id, long userId) {
+        log.debug("Пользователь {} ставит лайк фильму {}", userId, id);
         Film film = findById(id);
         int row = jdbc.update(ADD_RATING_FILM, id, userId, 10);
 
         if (row > 0) {
             getLikesAndGenresByFilmId(List.of(film));
             addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.ADD, id);
+            log.info("Лайк успешно добавлен: пользователь {} фильму {}", userId, id);
             return film;
         } else {
+            log.error("Не удалось добавить лайк");
             throw new RuntimeException("Не удалось добавить лайк");
         }
     }
 
     //Удалить лайк с фильма
     public int deleteLike(long id, long userId) {
+        log.debug("Пользователь {} удаляет лайк с фильма {}", userId, id);
         int row = jdbc.update(DELETE_LIKE, id, userId);
         if (row > 0) {
             addEvent(Instant.now().toEpochMilli(), userId, EventType.LIKE, Operation.REMOVE, id);
+            log.info("Лайк успешно удален: пользователь {} с фильма {}", userId, id);
             return row;
         } else {
+            log.error("Не удалось удалить лайк");
             throw new RuntimeException("Ну удалось удалить лайк");
         }
     }
 
     //Получить count популярных фильмов по указанным жанру и году
     public Collection<Film> getPopularFilmsByGenreIdByYear(int count, Integer genreId, Integer year) {
-        List<Film> popularFilm = jdbc.query(
-                FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR,
-                rowMapper,
-                genreId,
-                year,
-                count
-        );
+        log.debug("Получение {} популярных фильмов, жанр: {}, год: {}", count, genreId, year);
+        List<Film> popularFilm = jdbc.query(FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR, rowMapper, genreId, genreId, year, year, count);
 
         getLikesAndGenresByFilmId(popularFilm);
+        log.info("Получено {} популярных фильмов", popularFilm.size());
         return popularFilm;
     }
 
     // Проверяем существование режиссера
     public Collection<Film> getFilmsByDirectorSorted(long directorId, String sortBy) {
+        log.debug("Получение фильмов режиссера с id: {}, сортировка: {}", directorId, sortBy);
         Integer count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM directors WHERE id = ?",
                 Integer.class,
@@ -200,6 +226,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
         }
 
         List<Film> films = jdbc.query(sql, rowMapper, directorId);
+        log.info("Получено {} фильмов режиссера с id: {}", films.size(), directorId);
         return getLikesAndGenresByFilmId(films);
     }
 
@@ -362,6 +389,7 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
 
     //Получить список общих фильмов двух пользователей
     public Collection<Film> getCommonFilms(long userId, long friendId) {
+        log.debug("Получение общих фильмов пользователей {} и {}", userId, friendId);
         List<Film> films = jdbc.query(FIND_BY_COMMON_FILMS, (rs, rowNum) -> {
             Film film = new Film();
             film.setId(rs.getLong("id"));
@@ -372,8 +400,8 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
             return film;
         }, userId, friendId);
         getLikesAndGenresByFilmId(films);
+        log.info("Получено {} общих фильмов", films.size());
         return films;
-
     }
 
     public void addRatingFilm(long filmId, long userId, int rating) {
@@ -415,6 +443,41 @@ public class FilmDbStorage implements FilmStorage, FilmDirectorStorage {
                 throw new NotFoundException("Режиссёр с id = " + director.getId() + " не найден");
             }
         }
+    }
+
+    public Collection<Film> searchFilmsByTitleByDirector(String query, boolean title, boolean director) {
+        log.debug("Поиск фильмов по названию: {}, по режиссеру: {}", title, director);
+        Collection<Film> films = getLikesAndGenresByFilmId(
+                jdbc.query(FIND_FILMS_BY_TITLE_BY_DIRECTOR, rowMapper, title, query, director, query)
+        );
+        log.info("Получено {} фильмов по запросу: {}", films.size(), query);
+        return films;
+    }
+
+    @Override
+    public void deleteFilm(long id) {
+        log.debug("Удаление фильма с id: {}", id);
+        findById(id);
+
+        //Сначала удаляем связи с жанрами
+        jdbc.update("DELETE FROM movie_genres WHERE film_id = ?", id);
+
+        //Удаляем связи с режиссерами
+        jdbc.update("DELETE FROM film_directors WHERE film_id = ?", id);
+
+        //Удаляем лайки
+        jdbc.update("DELETE FROM likes_movies WHERE film_id = ?", id);
+
+        //Удаляем отзывы (если есть)
+        jdbc.update("DELETE FROM reviews WHERE film_id = ?", id);
+
+        //удаляем сам фильм
+        int rowsDeleted = jdbc.update("DELETE FROM films WHERE id = ?", id);
+        if (rowsDeleted == 0) {
+            log.error("Фильм с id = {} не найден", id);
+            throw new NotFoundException("Фильм с id = " + id + " не найден");
+        }
+        log.info("Фильм с id {} успешно удален", id);
     }
 
 

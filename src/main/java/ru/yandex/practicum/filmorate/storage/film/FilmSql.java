@@ -57,16 +57,15 @@ public class FilmSql {
 //            LIMIT ?""";
 
     static final String FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR = """
-                SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id,
-                COALESCE(AVG(rm.rating), 0.0) AS rating
-                FROM films AS f
-                JOIN rating_movies AS rm ON f.id = rm.film_id
-                JOIN movie_genres AS mg ON f.id = mg.film_id
-                WHERE mg.genre_id = ?\s
-                AND EXTRACT(YEAR FROM f.release_date) = ?
-                GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
-                ORDER BY rating DESC, f.id ASC
-                LIMIT ?;;
+            SELECT f.*
+            FROM films f
+            LEFT JOIN movie_genres mg ON f.id = mg.film_id
+            LEFT JOIN likes_movies lm ON f.id = lm.film_id
+            WHERE (? IS NULL OR mg.genre_id = ?)
+            AND (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?)
+            GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
+            ORDER BY COUNT(lm.user_id) DESC
+            LIMIT ?
             """;
 
     //SQL-запрос для проверки существования рейтинга MPA
@@ -103,4 +102,23 @@ public class FilmSql {
             INSERT INTO EVENTS (timestamp, user_id, event_type, operation, entity_id)
             VALUES (?, ?, ?, ?, ?)
             """;
+
+    //SQL-запрос для поиска фильмов по названию и
+    static final String FIND_FILMS_BY_TITLE_BY_DIRECTOR = """
+            SELECT
+                f.id,
+                f.name,
+                f.description,
+                f.release_date,
+                f.duration,
+                f.mpa_rating_id,
+                COUNT(lm.user_id) AS likes_count
+            FROM films f
+            LEFT JOIN film_directors fd ON f.id = fd.film_id
+            LEFT JOIN directors d ON fd.director_id = d.id
+            LEFT JOIN likes_movies lm ON f.id = lm.film_id
+            WHERE ? AND LOWER(f.name) LIKE '%' || LOWER(?) || '%'
+                OR ? AND LOWER(d.name) LIKE '%' || LOWER(?) || '%'
+            GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
+            ORDER BY likes_count DESC""";
 }

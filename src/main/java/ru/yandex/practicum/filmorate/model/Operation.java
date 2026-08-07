@@ -4,6 +4,10 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import java.util.Arrays;
 
+/*
+    Перечисление операций.
+    Определяет возможные операции над сущностями: добавление, удаление, обновление.
+ */
 public enum Operation {
     REMOVE,
     ADD,

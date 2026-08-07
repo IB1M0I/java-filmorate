@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -17,6 +18,7 @@ import ru.yandex.practicum.filmorate.storage.user.dto.UserDto;
 
 import java.util.Collection;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -72,7 +74,6 @@ public class UserService {
 
         if (userStorage.getFriends(friendId).stream()
                 .anyMatch(user -> user.getId() == id)) {
-            //userStorage.updateFriendshipIsConfirmed(friendId, id, true);
             return UserMapper.mapToUserDto(userStorage.addFriend(id, friendId, true));
         } else {
             return UserMapper.mapToUserDto(userStorage.addFriend(id, friendId, false));
@@ -136,8 +137,16 @@ public class UserService {
 
     //Получить события пользователя
     public Collection<Event> getEventsUser(long id) {
+        log.debug("Получение событий пользователя с id: {}", id);
+        Collection<Event> events = userStorage.getEventsUser(id);
+        log.info("Получено {} событий пользователя с id: {}", events.size(), id);
+        return events;
+    }
 
-        return userStorage.getEventsUser(id);
+    public void deleteUser(long id) {
+        log.debug("Удаление пользователя с id: {}", id);
+        userStorage.deleteUser(id);
+        log.info("Пользователь с id {} успешно удален", id);
     }
 
 

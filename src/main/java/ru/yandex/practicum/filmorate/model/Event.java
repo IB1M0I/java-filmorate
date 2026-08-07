@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/*
+    Сущность события пользователя.
+    Содержит информацию о действиях пользователей (лайки, отзывы, друзья).
+ */
 @Data
 @Builder
 @NoArgsConstructor

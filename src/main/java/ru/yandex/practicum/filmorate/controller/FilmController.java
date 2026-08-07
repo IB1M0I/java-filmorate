@@ -110,6 +110,44 @@ public class FilmController {
         return films;
     }
 
+    /**
+     *
+     * @param query текст для поиска
+     * @param by    может принимать значения director (поиск по режиссёру),
+     *              title (поиск по названию),
+     *              либо оба значения через запятую при поиске одновременно и по режиссеру и по названию
+     * @return возвращает список фильмов, отсортированных по популярности
+     */
+    @GetMapping("/search")
+    public Collection<FilmDto> searchFilmsByTitleByDirector(
+            @RequestParam @NotNull String query,
+            @RequestParam @NotNull String by
+    ) {
+        log.debug("Получен запрос на поиск по названию фильмов и по режиссёру {}: {}", by, query);
+        Collection<FilmDto> filmsByTitleByDirector = filmService.searchFilmsByTitleByDirector(query, by);
+        log.info("Получено {} фильмов по названию и по режиссёру {}: {}", filmsByTitleByDirector.size(), by, query);
+        return filmsByTitleByDirector;
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFilm(@PathVariable long id) {
+        log.debug("Получен запрос на удаление фильма с id: {}", id);
+        filmService.deleteFilm(id);
+        log.info("Фильм с id {} успешно удален", id);
+    }
+
+    @GetMapping("/common")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<FilmDto> getCommonFilms(
+            @RequestParam long userId,
+            @RequestParam long friendId) {
+        log.debug("Получен запрос на получение общих фильмов пользователей {} и {}", userId, friendId);
+        Collection<FilmDto> films = filmService.getCommonFilms(userId, friendId);
+        log.info("Получено {} общих фильмов", films.size());
+        return films;
+    }
+
     //Поставить оценку фильму
     @PutMapping("{filmId}/like/{userId}/{rating}")
     public void addRatingFilm(@PathVariable long filmId, @PathVariable long userId, @PathVariable int rating) {

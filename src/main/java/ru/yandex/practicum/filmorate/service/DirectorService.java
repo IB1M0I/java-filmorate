@@ -14,23 +14,42 @@ import java.util.Collection;
 public class DirectorService {
     private final DirectorStorage directorStorage;
 
+    //Создать режиссера
     public Director create(Director director) {
-        return directorStorage.create(director);
+        log.debug("Создание режиссера: {}", director.getName());
+        Director created = directorStorage.create(director);
+        log.info("Режиссер успешно создан с id: {}", created.getId());
+        return created;
     }
 
+    //Обновить режиссера
     public Director update(Director director) {
-        return directorStorage.update(director);
+        log.debug("Обновление режиссера с id: {}", director.getId());
+        Director updated = directorStorage.update(director);
+        log.info("Режиссер с id {} успешно обновлен", updated.getId());
+        return updated;
     }
 
+    //Получить всех режиссеров
     public Collection<Director> findAll() {
-        return directorStorage.findAll();
+        log.debug("Получение всех режиссеров");
+        Collection<Director> directors = directorStorage.findAll();
+        log.info("Получено {} режиссеров", directors.size());
+        return directors;
     }
 
+    //Получить режиссера по id
     public Director findById(long id) {
-        return directorStorage.findById(id);
+        log.debug("Получение режиссера с id: {}", id);
+        Director director = directorStorage.findById(id);
+        log.info("Режиссер с id {} успешно получен", id);
+        return director;
     }
 
+    //Удалить режиссера
     public void delete(long id) {
+        log.debug("Удаление режиссера с id: {}", id);
         directorStorage.delete(id);
+        log.info("Режиссер с id {} успешно удален", id);
     }
 }

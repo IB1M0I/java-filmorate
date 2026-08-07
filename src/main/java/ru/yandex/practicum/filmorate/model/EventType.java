@@ -4,6 +4,10 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import java.util.Arrays;
 
+/*
+    Перечисление типов событий.
+    Определяет возможные типы событий: лайк, отзыв, дружба.
+ */
 public enum EventType {
     LIKE,
     REVIEW,
