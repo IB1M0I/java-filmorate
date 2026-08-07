@@ -1,9 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
@@ -16,6 +19,7 @@ import java.util.Collection;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/films")
+@Validated
 public class FilmController {
     private final FilmService filmService;
 
@@ -61,7 +65,6 @@ public class FilmController {
     }
 
 
-
     //Поставить лайк фильму
     @PutMapping("/{id}/like/{userId}")
     public FilmDto likeFilm(@PathVariable long id, @PathVariable long userId) {
@@ -82,12 +85,67 @@ public class FilmController {
 
     //Получить список популярных фильмов
     @GetMapping("/popular")
-    public Collection<FilmDto> getPopular(@RequestParam(defaultValue = "10") int count) {
-        log.debug("Получен запрос на получение {} популярных фильмов", count);
-        Collection<FilmDto> films = filmService.getPopular(count);
-        log.info("Получено {} популярных фильмов", films.size());
+    public Collection<FilmDto> getPopular(
+            @RequestParam(defaultValue = "10") @NotNull @Positive Integer count,
+            @RequestParam(required = false) @Positive Integer genreId,
+            @RequestParam(required = false) @Positive Integer year) {
+        String logMsg = "популярных фильмов" +
+                (genreId != null ? " жанра с id=" + genreId : "") +
+                (year != null ? " " + year + " года" : "");
+        log.debug("Получен запрос на получение {} {}", count, logMsg);
+        Collection<FilmDto> films = filmService.getPopularFilmsByGenreIdByYear(count, genreId, year);
+        log.info("Получено {} {}", films.size(), logMsg);
         return films;
     }
 
+    //Получить фильмы режиссера с сортировкой
+    @GetMapping("/director/{directorId}")
+    public Collection<FilmDto> getFilmsByDirector(
+            @PathVariable long directorId,
+            @RequestParam String sortBy) {
+        log.debug("Получен запрос на получение фильмов режиссера с id: {}, сортировка: {}",
+                directorId, sortBy);
+        Collection<FilmDto> films = filmService.getFilmsByDirector(directorId, sortBy);
+        log.info("Получено {} фильмов режиссера с id: {}", films.size(), directorId);
+        return films;
+    }
+
+    /**
+     *
+     * @param query текст для поиска
+     * @param by    может принимать значения director (поиск по режиссёру),
+     *              title (поиск по названию),
+     *              либо оба значения через запятую при поиске одновременно и по режиссеру и по названию
+     * @return возвращает список фильмов, отсортированных по популярности
+     */
+    @GetMapping("/search")
+    public Collection<FilmDto> searchFilmsByTitleByDirector(
+            @RequestParam @NotNull String query,
+            @RequestParam @NotNull String by
+    ) {
+        log.debug("Получен запрос на поиск по названию фильмов и по режиссёру {}: {}", by, query);
+        Collection<FilmDto> filmsByTitleByDirector = filmService.searchFilmsByTitleByDirector(query, by);
+        log.info("Получено {} фильмов по названию и по режиссёру {}: {}", filmsByTitleByDirector.size(), by, query);
+        return filmsByTitleByDirector;
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFilm(@PathVariable long id) {
+        log.debug("Получен запрос на удаление фильма с id: {}", id);
+        filmService.deleteFilm(id);
+        log.info("Фильм с id {} успешно удален", id);
+    }
+
+    @GetMapping("/common")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<FilmDto> getCommonFilms(
+            @RequestParam long userId,
+            @RequestParam long friendId) {
+        log.debug("Получен запрос на получение общих фильмов пользователей {} и {}", userId, friendId);
+        Collection<FilmDto> films = filmService.getCommonFilms(userId, friendId);
+        log.info("Получено {} общих фильмов", films.size());
+        return films;
+    }
 
 }

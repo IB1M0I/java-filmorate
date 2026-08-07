@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.exeption;
+package ru.yandex.practicum.filmorate.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -59,5 +59,6 @@ public class ExceptionHandlers {
         log.error("Внутренняя ошибка сервера: {}", e.getMessage(), e);
         return Map.of("error", e.getMessage());
     }
+
 
 }

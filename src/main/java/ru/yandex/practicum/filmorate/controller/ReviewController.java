@@ -1,0 +1,115 @@
+package ru.yandex.practicum.filmorate.controller;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.service.ReviewService;
+import ru.yandex.practicum.filmorate.storage.review.dto.NewReviewRequest;
+import ru.yandex.practicum.filmorate.storage.review.dto.ReviewDto;
+import ru.yandex.practicum.filmorate.storage.review.dto.UpdateReviewRequest;
+
+import java.util.Collection;
+
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/reviews")
+public class ReviewController {
+    private final ReviewService reviewService;
+
+    //Добавить отзыв на фильм
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReviewDto addReview(@Valid @RequestBody NewReviewRequest request) {
+        log.debug("Получен запрос на добавление отзыва от пользователя {}", request.getUserId());
+        ReviewDto review = reviewService.addReview(request);
+        log.info("Отзыв успешно добавлен с id: {}", review.getReviewId());
+        return review;
+    }
+
+    //Обновить отзыв
+    @PutMapping
+    public ReviewDto updateReview(@Valid @RequestBody UpdateReviewRequest request) {
+        log.debug("Получен запрос на обновление отзыва с id: {}", request.getReviewId());
+        ReviewDto review = reviewService.updateReview(request);
+        log.info("Отзыв с id {} успешно обновлен", review.getReviewId());
+        return review;
+    }
+
+    //Удалить отзыв
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteReview(@PathVariable long id) {
+        log.debug("Получен запрос на удаление отзыва с id: {}", id);
+        reviewService.deleteReview(id);
+        log.info("Отзыв с id {} успешно удален", id);
+    }
+
+    //Получить отзыв по id
+    @GetMapping("/{id}")
+    public ReviewDto findById(@PathVariable long id) {
+        log.debug("Получен запрос на получение отзыва с id: {}", id);
+        ReviewDto review = reviewService.findById(id);
+        log.info("Отзыв с id {} успешно получен", id);
+        return review;
+    }
+
+    //Получить список отзывов
+    @GetMapping
+    public Collection<ReviewDto> findAll(
+            @RequestParam(required = false) Long filmId,
+            @RequestParam(defaultValue = "10") @Positive(message = "Количество должно быть положительным числом") int count) {
+        log.debug("Получен запрос на получение отзывов для фильма: {}", filmId);
+        Collection<ReviewDto> reviews = reviewService.findAll(filmId, count);
+        log.info("Получено {} отзывов", reviews.size());
+        return reviews;
+    }
+
+    //Поставить лайк отзыву
+    @PutMapping("/{id}/like/{userId}")
+    public ReviewDto addLike(
+            @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
+            @PathVariable @Positive(message = "ID пользователя должен быть положительным числом") long userId) {
+        log.debug("Пользователь {} ставит лайк отзыву {}", userId, id);
+        ReviewDto review = reviewService.addLike(id, userId);
+        log.info("Лайк успешно добавлен: пользователь {} отзыву {}", userId, id);
+        return review;
+    }
+
+    //Поставить дизлайк отзыву
+    @PutMapping("/{id}/dislike/{userId}")
+    public ReviewDto addDislike(
+            @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
+            @PathVariable @Positive(message = "ID пользователя должен быть положительным числом") long userId) {
+        log.debug("Пользователь {} ставит дизлайк отзыву {}", userId, id);
+        ReviewDto review = reviewService.addDislike(id, userId);
+        log.info("Дизлайк успешно добавлен: пользователь {} отзыву {}", userId, id);
+        return review;
+    }
+
+    //Удалить лайк с отзыва
+    @DeleteMapping("/{id}/like/{userId}")
+    public ReviewDto deleteLike(
+            @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
+            @PathVariable @Positive(message = "ID пользователя должен быть положительным числом") long userId) {
+        log.debug("Пользователь {} удаляет лайк с отзыва {}", userId, id);
+        ReviewDto review = reviewService.deleteLike(id, userId);
+        log.info("Лайк успешно удален: пользователь {} с отзыва {}", userId, id);
+        return review;
+    }
+
+    //Удалить дизлайк с отзыва
+    @DeleteMapping("/{id}/dislike/{userId}")
+    public ReviewDto deleteDislike(
+            @PathVariable @Positive(message = "ID отзыва должен быть положительным числом") long id,
+            @PathVariable @Positive(message = "ID пользователя должен быть положительным числом") long userId) {
+        log.debug("Пользователь {} удаляет дизлайк с отзыва {}", userId, id);
+        ReviewDto review = reviewService.deleteDislike(id, userId);
+        log.info("Дизлайк успешно удален: пользователь {} с отзыва {}", userId, id);
+        return review;
+    }
+}
+

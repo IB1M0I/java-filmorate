@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.film.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.storage.film.dto.UpdateFilmRequest;
 
+import java.util.LinkedHashSet;
 import java.util.HashSet;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -24,6 +25,7 @@ public class FilmMapper {
         filmDto.setMpa(film.getMpa());
         filmDto.setGenres(film.getGenres());
         filmDto.setLikes(film.getLikes());
+        filmDto.setDirectors(film.getDirectors());
         return filmDto;
     }
 
@@ -42,28 +44,40 @@ public class FilmMapper {
         }
         film.setGenres(request.getGenres());
         film.setLikes(new HashSet<Long>());
+        if (request.getDirectors() != null) {
+            film.setDirectors(request.getDirectors());
+        } else {
+            film.setDirectors(new HashSet<>());
+        }
         return film;
     }
 
     //Обновить сущность Film данными из запроса на обновление
     public static Film mapToUpdate(Film film, UpdateFilmRequest request) {
-        if (request.hasDescription()) {
-            film.setDescription(request.getDescription());
-        }
-        if (request.hasDuration()) {
-            film.setDuration(request.getDuration());
-        }
         if (request.hasName()) {
             film.setName(request.getName());
+        }
+        if (request.hasDescription()) {
+            film.setDescription(request.getDescription());
         }
         if (request.hasReleaseDate()) {
             film.setReleaseDate(request.getReleaseDate());
         }
+        if (request.hasDuration()) {
+            film.setDuration(request.getDuration());
+        }
         if (request.hasMpaRatingId()) {
             film.setMpa(new MpaRating(request.getMpa().getId()));
         }
-        if (request.hasGenres()) {
+        if (request.getGenres() != null) {
             film.setGenres(request.getGenres());
+        } else {
+            film.setGenres(new LinkedHashSet<>());
+        }
+        if (request.getDirectors() != null) {
+            film.setDirectors(request.getDirectors());
+        } else {
+            film.setDirectors(new HashSet<>());
         }
         return film;
 

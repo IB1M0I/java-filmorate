@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate.storage.film.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Director;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -18,13 +22,14 @@ public class UpdateFilmRequest {
     private Integer duration;
     private MpaRating mpa;
     private LinkedHashSet<Genre> genres;
+    private Set<Director> directors = new HashSet<>();
 
     public boolean hasName() {
-        return name != null || !name.isBlank();
+        return StringUtils.hasText(name);
     }
 
     public boolean hasDescription() {
-        return description != null || !description.isBlank();
+        return StringUtils.hasText(description);
     }
 
     public boolean hasReleaseDate() {
@@ -41,5 +46,9 @@ public class UpdateFilmRequest {
 
     public boolean hasGenres() {
         return genres != null && !genres.isEmpty();
+    }
+
+    public boolean hasDirectors() {
+        return directors != null && !directors.isEmpty();
     }
 }

@@ -9,6 +9,10 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+/*
+    Сущность пользователя.
+    Содержит информацию о пользователе: email, логин, имя, день рождения и список друзей.
+ */
 @Data
 @Builder
 @AllArgsConstructor

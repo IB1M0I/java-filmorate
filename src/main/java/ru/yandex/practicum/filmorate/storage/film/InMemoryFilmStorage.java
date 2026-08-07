@@ -3,9 +3,11 @@ package ru.yandex.practicum.filmorate.storage.film;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
-import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operation;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -100,6 +102,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Collection<Film> findAll() {
         log.trace("Вызван метод получения списка фильма");
         return films.values();
+
+    }
+
+    @Override
+    public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
 
     }
 

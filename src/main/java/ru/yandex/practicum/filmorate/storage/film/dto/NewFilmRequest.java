@@ -7,10 +7,12 @@ import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Director;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.HashSet;
 
 @Data
 @Builder
@@ -25,4 +27,5 @@ public class NewFilmRequest {
     private LinkedHashSet<Genre> genres;
     private Set<Long> likes;
     private MpaRating mpa;
+    private Set<Director> directors = new HashSet<>();
 }

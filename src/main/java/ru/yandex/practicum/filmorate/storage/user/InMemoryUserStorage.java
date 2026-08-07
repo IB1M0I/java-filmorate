@@ -4,8 +4,10 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.exeption.NotFoundException;
-import ru.yandex.practicum.filmorate.exeption.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -72,20 +74,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     //Удалить пользователя
-    public User deleteUser(long id) {
-        log.trace("Вызван метод deleteUser");
-        log.debug("id = {}", id);
-
+    @Override
+    public void deleteUser(long id) {
         if (!users.containsKey(id)) {
-            log.error("Пользователь с id = {} не найден", id);
-            throw new NotFoundException(String.format("Пользователь с id = %d не найден", id));
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
-
-        User user = users.get(id);
-
         users.remove(id);
         log.info("Пользователь с id = {} удален", id);
-        return user;
     }
 
     //Получить пользователя по id
@@ -106,6 +101,11 @@ public class InMemoryUserStorage implements UserStorage {
         log.trace("Вызван метод получения списка пользователей");
         log.info("Вернули список пользователей");
         return users.values();
+    }
+
+    @Override
+    public void addEvent(long timestamp, long userId, EventType eventType, Operation operation, long entityId) {
+
     }
 
 
