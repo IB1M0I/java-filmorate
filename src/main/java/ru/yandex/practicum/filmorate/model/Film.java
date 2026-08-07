@@ -46,7 +46,6 @@ public class Film {
 
     @Min(1)
     @Max(10)
-    @JsonProperty("rate")
     private Double rating = 0.0;
 
     @Builder.Default

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
@@ -17,6 +18,7 @@ public class FilmDto {
     private Integer duration;
     private MpaRating mpa;
     private Set<Genre> genres;
+    @JsonProperty("rate")
     private Double rating;
     private Set<Director> directors;
 }
