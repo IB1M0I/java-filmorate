@@ -100,9 +100,18 @@ public class UserDbStorage implements UserStorage {
     public User addFriend(long id, long friendId, boolean isConfirmed) {
         log.debug("Добавление друга: пользователь {} добавляет пользователя {}", id, friendId);
         User user = findById(friendId);
-        int row = jdbc.update(ADD_FRIEND, id, friendId, isConfirmed);
+
+        // Проверяем, есть ли уже встречная заявка (friendId уже добавил id раньше)
+        boolean reverseExists = friendshipExists(friendId, id);
+        boolean confirmed = isConfirmed || reverseExists;
+
+        int row = jdbc.update(ADD_FRIEND, id, friendId, confirmed);
 
         if (row > 0) {
+            if (reverseExists) {
+                // Обновляем встречную запись на подтверждённую
+                updateFriendshipIsConfirmed(friendId, id, true);
+            }
             addEvent(Instant.now().toEpochMilli(), id, EventType.FRIEND, Operation.ADD, friendId);
             log.info("Друг успешно добавлен: пользователь {} добавил пользователя {}", id, friendId);
             return user;
@@ -110,8 +119,17 @@ public class UserDbStorage implements UserStorage {
             log.error("Не удалось добавить друга");
             throw new RuntimeException("Не удалось добавить друга");
         }
-
     }
+
+    //Проверить существование записи о дружбе
+    private boolean friendshipExists(long id, long friendId) {
+        Integer count = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM friendships WHERE user_id = ? AND friend_id = ?",
+                Integer.class, id, friendId);
+        return count != null && count > 0;
+    }
+
+
 
     //Обновить статус подтверждения дружбы
     public void updateFriendshipIsConfirmed(long id, long friendId, boolean isConfirmed) {
@@ -126,6 +144,12 @@ public class UserDbStorage implements UserStorage {
         int row = jdbc.update(DELETE_FRIEND, id, friendId);
 
         if (row > 0) {
+            // Если была взаимная (подтверждённая) дружба — откатываем обратную запись до неподтверждённой,
+            // а не удаляем её полностью (пользователь friendId по-прежнему может считать id своим "запрошенным" другом)
+            boolean reverseExists = friendshipExists(friendId, id);
+            if (reverseExists) {
+                updateFriendshipIsConfirmed(friendId, id, false);
+            }
             addEvent(Instant.now().toEpochMilli(), id, EventType.FRIEND, Operation.REMOVE, friendId);
             log.info("Друг успешно удален: пользователь {} удалил пользователя {}", id, friendId);
         }
