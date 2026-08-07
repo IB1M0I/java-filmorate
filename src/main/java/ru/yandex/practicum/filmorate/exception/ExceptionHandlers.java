@@ -47,7 +47,6 @@ public class ExceptionHandlers {
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleEmptyResultDataAccessException(final EmptyResultDataAccessException e) {
-        System.out.println("ОШИБКА!!!!!!!!!!!!!!!!!!!!!!!!!!");
         log.error("Ошибка доступа к данным: {}", e.getMessage());
         return Map.of("error", "Ошибка валидации");
     }

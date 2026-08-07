@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.model.Director;
@@ -24,11 +25,11 @@ public class UpdateFilmRequest {
     private Set<Director> directors = new HashSet<>();
 
     public boolean hasName() {
-        return name != null || !name.isBlank();
+        return StringUtils.hasText(name);
     }
 
     public boolean hasDescription() {
-        return description != null || !description.isBlank();
+        return StringUtils.hasText(description);
     }
 
     public boolean hasReleaseDate() {
