@@ -1,6 +1,6 @@
 logging:
   level:
-    org.zalando.logbook: trace
+    org.zalando.logbook: debug
 
 spring:
   sql:

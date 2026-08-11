@@ -185,4 +185,11 @@ public class FilmService {
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
+
+    public void addRatingFilm(long filmId, long userId, double rating) {
+        filmStorage.addRatingFilm(filmId,userId,rating);
+    }
+
+
+
 }

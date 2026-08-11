@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,8 +40,9 @@ public class Film {
 
     private MpaRating mpa; //MPA рейтинг
 
-    @Builder.Default
-    private Set<Long> likes = new HashSet<>(); //Лайки
+    @Min(1)
+    @Max(10)
+    private Double rating = 0.0;
 
     @Builder.Default
     private Set<Director> directors = new HashSet<>();

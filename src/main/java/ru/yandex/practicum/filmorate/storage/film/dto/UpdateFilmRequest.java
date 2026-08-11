@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.util.StringUtils;
@@ -22,6 +23,9 @@ public class UpdateFilmRequest {
     private Integer duration;
     private MpaRating mpa;
     private LinkedHashSet<Genre> genres;
+
+    @JsonProperty("rate")
+    private Double rating;
     private Set<Director> directors = new HashSet<>();
 
     public boolean hasName() {
@@ -50,5 +54,9 @@ public class UpdateFilmRequest {
 
     public boolean hasDirectors() {
         return directors != null && !directors.isEmpty();
+    }
+
+    public boolean hasRating() {
+        return rating != null;
     }
 }

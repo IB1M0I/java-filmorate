@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -28,4 +26,8 @@ public class NewFilmRequest {
     private Set<Long> likes;
     private MpaRating mpa;
     private Set<Director> directors = new HashSet<>();
+
+    @Min(1)
+    @Max(10)
+    private Double rating = 0.0;
 }
