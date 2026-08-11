@@ -19,7 +19,6 @@ public class FilmSql {
             "LEFT JOIN rating_movies r ON f.id = r.film_id " +
             "WHERE f.id = ? " +
             "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id";
-    ;
 
     //SQL-запрос для обновления фильма
     static final String UPDATE_FILM = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?, rating = ? WHERE id = ?";
@@ -47,16 +46,16 @@ public class FilmSql {
     static final String DELETE_LIKE = "DELETE FROM rating_movies WHERE film_id = ? AND user_id = ?";
     //SQL-запрос для получения count популярных фильмов по указанным жанру и году
     public static final String FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR = """
-    SELECT f.*
-    FROM films f
-    LEFT JOIN movie_genres mg ON f.id = mg.film_id
-    LEFT JOIN rating_movies lm ON f.id = lm.film_id
-    WHERE (? IS NULL OR mg.genre_id = ?)
-      AND (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?)
-    GROUP BY f.id
-    ORDER BY AVG(lm.rating) DESC, COUNT(lm.user_id) DESC, f.id ASC
-    LIMIT ?
-    """;
+            SELECT f.*
+            FROM films f
+            LEFT JOIN movie_genres mg ON f.id = mg.film_id
+            LEFT JOIN rating_movies lm ON f.id = lm.film_id
+            WHERE (? IS NULL OR mg.genre_id = ?)
+              AND (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?)
+            GROUP BY f.id
+            ORDER BY AVG(lm.rating) DESC, COUNT(lm.user_id) DESC, f.id ASC
+            LIMIT ?
+            """;
 
 //    static final String FIND_POPULAR_FILMS_BY_GENRE_ID_BY_YEAR = """
 //            SELECT f.*

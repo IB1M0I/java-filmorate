@@ -8,8 +8,8 @@ import ru.yandex.practicum.filmorate.storage.film.dto.FilmDto;
 import ru.yandex.practicum.filmorate.storage.film.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.storage.film.dto.UpdateFilmRequest;
 
-import java.util.LinkedHashSet;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FilmMapper {
@@ -43,7 +43,7 @@ public class FilmMapper {
             film.setMpa(new MpaRating());
         }
         film.setGenres(request.getGenres());
-        if(request.getRating() != null){
+        if (request.getRating() != null) {
             film.setRating(request.getRating());
         }
         if (request.getDirectors() != null) {
@@ -81,7 +81,7 @@ public class FilmMapper {
         } else {
             film.setDirectors(new HashSet<>());
         }
-        if(request.hasRating()){
+        if (request.hasRating()) {
             film.setRating(request.getRating());
         }
         return film;
